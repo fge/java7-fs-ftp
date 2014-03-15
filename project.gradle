@@ -1,0 +1,28 @@
+/*
+ * Project-specific settings. Unfortunately we cannot put the name in there!
+ */
+group = "com.github.fge";
+version = "0.1-SNAPSHOT";
+sourceCompatibility = "1.7";
+targetCompatibility = "1.7"; // defaults to sourceCompatibility
+
+project.ext {
+    description = "A Java 7 FileSystem provider for FTP servers";
+};
+
+/*
+ * List of dependencies
+ */
+dependencies {
+    compile(group: "commons-net", name: "commons-net", version: "3.3");
+    testCompile(group: "org.testng", name: "testng", version: "6.8.7") {
+        exclude(group: "junit", module: "junit");
+        exclude(group: "org.beanshell", module: "bsh");
+        exclude(group: "org.yaml", module: "snakeyaml");
+    };
+    testCompile(group: "org.mockito", name: "mockito-core", version: "1.9.5");
+}
+
+javadoc.options.links("http://docs.oracle.com/javase/7/docs/api");
+javadoc.options.links("http://commons.apache.org/proper/commons-net/apidocs/");
+
