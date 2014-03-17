@@ -18,7 +18,12 @@
 
 package com.github.fge.ftpfs;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.testng.Assert.*;
 
@@ -33,5 +38,30 @@ public final class SlashDelimitedPathTest
         } catch (NullPointerException e) {
             assertEquals(e.getMessage(), "null argument is not allowed");
         }
+    }
+
+    @DataProvider
+    public Iterator<Object[]> pathInputs()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { "foo", "foo" });
+        list.add(new Object[] { "foo/", "foo"});
+        list.add(new Object[] { "foo//", "foo"});
+        list.add(new Object[] { "foo/.", "foo/."});
+        list.add(new Object[] { "foo//.", "foo/."});
+        list.add(new Object[] { "//foo/", "/foo" });
+        list.add(new Object[] { "/foo//bar/..//", "/foo/bar/.." });
+
+        return list.iterator();
+    }
+
+    @Test(dataProvider = "pathInputs")
+    public void constructorRemovesExtraSlashes(final String input,
+        final String expected)
+    {
+        final SlashDelimitedPath path = new SlashDelimitedPath(input);
+
+        assertEquals(path.toString(), expected);
     }
 }
