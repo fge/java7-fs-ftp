@@ -23,6 +23,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class holding a slash-delimited path
+ *
+ * <p>This class mimicks the JDK's implementation of Oracle's/OpenJDK's {@code
+ * UnixPath}. That is:</p>
+ *
+ * <ul>
+ *     <li>trailing slashes are removed from the input (ie, {@code foo/} becomes
+ *     {@code foo};</li>
+ *     <li>extra slashes are removed (ie, {@code //foo/..//bar} becomes {@code
+ *     /foo/../bar}).</li>
+ * </ul>
+ *
+ * <p>It also provides utility methods to tell whether the path is absolute
+ * (ie, begins with a {@code /}) and normalized (ie, there is no {@code .} or
+ * {@code ..} in path components).</p>
+ */
 public final class SlashDelimitedPath
 {
     private static final char SLASH = '/';
@@ -56,11 +73,26 @@ public final class SlashDelimitedPath
         asString = sb.toString();
     }
 
+    /**
+     * Is this path absolute?
+     *
+     * <p>A path is absolute only if it begins with a {@code /}.</p>
+     *
+     * @return true if the path is absolute
+     */
     public boolean isAbsolute()
     {
         return absolute;
     }
 
+    /**
+     * Is this path normalized?
+     *
+     * <p>A path is normalized only if it has no {@code .} or {@code ..} path
+     * elements.</p>
+     *
+     * @return true if the path is normalized
+     */
     public boolean isNormalized()
     {
         for (final String component: components)
