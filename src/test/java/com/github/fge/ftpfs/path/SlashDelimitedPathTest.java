@@ -45,6 +45,9 @@ public final class SlashDelimitedPathTest
     {
         final List<Object[]> list = new ArrayList<>();
 
+        list.add(new Object[] { "", "" });
+        list.add(new Object[] { "/", "/" });
+        list.add(new Object[] { "//", "/" });
         list.add(new Object[] { "foo", "foo" });
         list.add(new Object[] { "foo/", "foo"});
         list.add(new Object[] { "foo//", "foo"});
@@ -63,6 +66,26 @@ public final class SlashDelimitedPathTest
         final SlashDelimitedPath path = SlashDelimitedPath.fromString(input);
 
         assertEquals(path.toString(), expected);
+    }
+
+    @Test(dataProvider = "pathInputs")
+    public void hashCodeAndEqualsWork(final String first,
+        final String second)
+    {
+        final SlashDelimitedPath p1 = SlashDelimitedPath.fromString(first);
+        final SlashDelimitedPath p2 = SlashDelimitedPath.fromString(second);
+        assertTrue(p1.equals(p2));
+        assertTrue(p2.equals(p1));
+        assertEquals(p1.hashCode(), p2.hashCode());
+    }
+
+    @Test
+    public void basicEqualsHashCodeContractIsRespected()
+    {
+        final SlashDelimitedPath path = SlashDelimitedPath.fromString("foo");
+        assertTrue(path.equals(path));
+        assertFalse(path.equals(null));
+        assertFalse(path.equals(new Object()));
     }
 
     @DataProvider

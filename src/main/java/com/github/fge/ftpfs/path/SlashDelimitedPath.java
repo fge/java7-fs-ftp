@@ -91,5 +91,22 @@ public abstract class SlashDelimitedPath
     public abstract boolean isNormalized();
 
     @Override
+    public final int hashCode()
+    {
+        return toString().hashCode();
+    }
+
+    @Override
+    public final boolean equals(final Object obj)
+    {
+        if (obj == null)
+            return false;
+        if (this == obj)
+            return true;
+        return obj instanceof SlashDelimitedPath
+            && toString().equals(obj.toString());
+    }
+
+    @Override
     public abstract String toString();
 }
