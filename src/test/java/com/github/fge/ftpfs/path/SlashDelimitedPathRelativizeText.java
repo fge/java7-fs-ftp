@@ -37,6 +37,10 @@ public final class SlashDelimitedPathRelativizeText
         list.add(new Object[] { "/a/b", "/a/b/c/d", "c/d" });
         list.add(new Object[] { "/a/b/c/d", "/a/b", "../.."});
         list.add(new Object[] { "/a/b", "/a/b", ""});
+        list.add(new Object[] { "/a/b", "/a/c", "../c"});
+        list.add(new Object[] { "a/b", "a/c", "../c"});
+        list.add(new Object[] { "a/b", "c", "../../c"});
+        list.add(new Object[] { "../a/b", "../c", "../../c"});
 
         return list.iterator();
     }
@@ -50,6 +54,6 @@ public final class SlashDelimitedPathRelativizeText
         final SlashDelimitedPath rel = SlashDelimitedPath.fromString(relpath);
 
         assertEquals(src.relativize(dst), rel);
-        assertEquals(src.resolve(rel).normalize(), dst);
+        assertEquals(src.relativize(src.resolve(rel)), rel);
     }
 }
