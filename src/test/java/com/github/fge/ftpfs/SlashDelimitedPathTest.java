@@ -33,7 +33,7 @@ public final class SlashDelimitedPathTest
     public void constructorRefusesNullArguments()
     {
         try {
-            new SlashDelimitedPath(null);
+            SlashDelimitedPath.fromString(null);
             fail("No exception thrown!");
         } catch (NullPointerException e) {
             assertEquals(e.getMessage(), "null argument is not allowed");
@@ -60,8 +60,32 @@ public final class SlashDelimitedPathTest
     public void constructorRemovesExtraSlashes(final String input,
         final String expected)
     {
-        final SlashDelimitedPath path = new SlashDelimitedPath(input);
+        final SlashDelimitedPath path = SlashDelimitedPath.fromString(input);
 
         assertEquals(path.toString(), expected);
+    }
+
+    @DataProvider
+    public Iterator<Object[]> absoluteAndNormalizedTests()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { "", false, true });
+        list.add(new Object[] { "/", true, true });
+        list.add(new Object[] { ".", false, false });
+        list.add(new Object[] { "/foo/bar", true, true });
+        list.add(new Object[] { "/foo/..", true, false });
+        list.add(new Object[] { "/foo/.", true, false });
+        return list.iterator();
+    }
+
+    @Test(dataProvider = "absoluteAndNormalizedTests")
+    public void absoluteAndNormalizedPathsAreDetectedAccurately(
+        final String input, final boolean absolute, final boolean normalized
+    )
+    {
+        final SlashDelimitedPath path = SlashDelimitedPath.fromString(input);
+        assertEquals(path.isAbsolute(), absolute);
+        assertEquals(path.isNormalized(), normalized);
     }
 }

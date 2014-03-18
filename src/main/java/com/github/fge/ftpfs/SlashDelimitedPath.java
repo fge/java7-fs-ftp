@@ -43,6 +43,8 @@ import java.util.regex.Pattern;
  */
 public final class SlashDelimitedPath
 {
+    private static final SlashDelimitedPath EMPTY = new SlashDelimitedPath();
+
     private static final char SLASH = '/';
 
     private static final String SELF = ".";
@@ -56,10 +58,24 @@ public final class SlashDelimitedPath
     private final boolean absolute;
     private final boolean normalized;
 
-    public SlashDelimitedPath(final String input)
+    public static SlashDelimitedPath fromString(final String input)
     {
         Objects.requireNonNull(input, "null argument is not allowed");
-        absolute = input.charAt(0) == SLASH;
+        return input.isEmpty() ? EMPTY
+            : new SlashDelimitedPath(input);
+    }
+
+    private SlashDelimitedPath()
+    {
+        asString = "";
+        components = Collections.emptyList();
+        absolute = false;
+        normalized = true;
+    }
+
+    private SlashDelimitedPath(final String input)
+    {
+        absolute = !input.isEmpty() && input.charAt(0) == SLASH;
 
         final StringBuilder sb = new StringBuilder();
 
