@@ -19,6 +19,7 @@
 package com.github.fge.ftpfs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -50,9 +51,10 @@ public final class SlashDelimitedPath
     private static final Pattern SLASHES = Pattern.compile("/+");
 
     private final String asString;
-    private final List<String> components = new ArrayList<>();
+    private final List<String> components;
 
     private final boolean absolute;
+    private final boolean normalized;
 
     public SlashDelimitedPath(final String input)
     {
@@ -61,13 +63,20 @@ public final class SlashDelimitedPath
 
         final StringBuilder sb = new StringBuilder();
 
+        final List<String> list = new ArrayList<>();
+        boolean isNormalized = true;
+
         for (final String component: SLASHES.split(input))  {
             if (component.isEmpty())
                 continue;
-            components.add(component);
+            if (SELF.equals(component) || PARENT.equals(component))
+                isNormalized = false;
+            list.add(component);
             sb.append(SLASH).append(component);
         }
 
+        components = Collections.unmodifiableList(list);
+        normalized = isNormalized;
         if (!absolute)
             sb.deleteCharAt(0);
         asString = sb.toString();
@@ -95,10 +104,7 @@ public final class SlashDelimitedPath
      */
     public boolean isNormalized()
     {
-        for (final String component: components)
-            if (SELF.equals(component) || PARENT.equals(component))
-                return false;
-        return true;
+        return normalized;
     }
 
     @Override
