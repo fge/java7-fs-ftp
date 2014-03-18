@@ -59,11 +59,11 @@ public final class SlashDelimitedPath
 
     private static final Pattern SLASHES = Pattern.compile("/+");
 
-    protected final List<String> components;
+    private final List<String> components;
     private final String asString;
 
-    protected final boolean absolute;
-    protected final boolean normalized;
+    private final boolean absolute;
+    private final boolean normalized;
 
     private SlashDelimitedPath(final List<String> components,
         final boolean absolute, final boolean normalized)
