@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.*;
 
 public final class SlashDelimitedPathNormalizeTest
 {
@@ -59,5 +59,6 @@ public final class SlashDelimitedPathNormalizeTest
         final SlashDelimitedPath expected
             = SlashDelimitedPath.fromString(result);
         assertEquals(orig.normalize(), expected);
+        assertTrue(expected.isNormalized());
     }
 }

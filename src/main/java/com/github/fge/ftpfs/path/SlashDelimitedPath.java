@@ -91,8 +91,7 @@ public final class SlashDelimitedPath
             return ROOT;
 
         final List<String> components = Arrays.asList(SLASHES.split(s));
-        final boolean normalized = !(components.contains(SELF)
-            || components.contains(PARENT));
+        final boolean normalized = isNormalized(components);
         return new SlashDelimitedPath(components, absolute, normalized);
     }
 
@@ -129,8 +128,7 @@ public final class SlashDelimitedPath
             return this;
         final List<String> list = new ArrayList<>(components);
         list.addAll(other.components);
-        return new SlashDelimitedPath(list, absolute,
-            normalized && other.normalized);
+        return new SlashDelimitedPath(list, absolute, isNormalized(list));
     }
 
     public SlashDelimitedPath normalize()
@@ -201,5 +199,32 @@ public final class SlashDelimitedPath
             sb.append('/').append(list.get(i));
 
         return sb.toString();
+    }
+
+    private static boolean isNormalized(final List<String> components)
+    {
+        /*
+         * Note: Paths.get("").normalize() throws an
+         * ArrayIndexOutOfBoundsException; we don't
+         */
+        if (components.isEmpty())
+            return true;
+
+        final int size = components.size();
+        int lastParent = -1, lastNonParent = -1;
+        String component;
+
+        for (int index = 0; index < size; index++) {
+            component = components.get(index);
+            if (SELF.equals(component))
+                return false;
+            if (PARENT.equals(component))
+                lastParent = index;
+            else
+                lastNonParent = index;
+        }
+
+        return lastParent == -1 || lastNonParent == -1
+            || lastNonParent > lastParent;
     }
 }
