@@ -50,9 +50,9 @@ public final class SlashDelimitedPath
     implements Iterable<String>
 {
     private static final SlashDelimitedPath ROOT
-        = new SlashDelimitedPath(Collections.<String>emptyList(), true, true);
+        = new SlashDelimitedPath(Collections.<String>emptyList(), true);
     private static final SlashDelimitedPath EMPTY
-        = new SlashDelimitedPath(Collections.<String>emptyList(), false, true);
+        = new SlashDelimitedPath(Collections.<String>emptyList(), false);
 
     private static final String SELF = ".";
     private static final String PARENT = "..";
@@ -66,11 +66,11 @@ public final class SlashDelimitedPath
     private final boolean normalized;
 
     private SlashDelimitedPath(final List<String> components,
-        final boolean absolute, final boolean normalized)
+        final boolean absolute)
     {
         this.components = Collections.unmodifiableList(components);
         this.absolute = absolute;
-        this.normalized = normalized;
+        normalized = isNormalized(components);
         asString = toString(absolute, components);
     }
 
@@ -90,8 +90,7 @@ public final class SlashDelimitedPath
             return ROOT;
 
         final List<String> components = Arrays.asList(SLASHES.split(s));
-        final boolean normalized = isNormalized(components);
-        return new SlashDelimitedPath(components, absolute, normalized);
+        return new SlashDelimitedPath(components, absolute);
     }
 
     /**
@@ -127,7 +126,7 @@ public final class SlashDelimitedPath
             return this;
         final List<String> list = new ArrayList<>(components);
         list.addAll(other.components);
-        return new SlashDelimitedPath(list, absolute, isNormalized(list));
+        return new SlashDelimitedPath(list, absolute);
     }
 
     public SlashDelimitedPath normalize()
@@ -151,7 +150,7 @@ public final class SlashDelimitedPath
                 nrComponents++;
         }
 
-        return new SlashDelimitedPath(new ArrayList<>(deque), absolute, true);
+        return new SlashDelimitedPath(new ArrayList<>(deque), absolute);
     }
 
     /*
@@ -174,8 +173,7 @@ public final class SlashDelimitedPath
             : other.normalize();
 
         if (src.equals(dst))
-            return new SlashDelimitedPath(Collections.<String>emptyList(),
-                false, true);
+            return new SlashDelimitedPath(Collections.<String>emptyList(), false);
 
         final List<String> list = new ArrayList<>();
 
@@ -214,7 +212,7 @@ public final class SlashDelimitedPath
         if (!srcIterator.hasNext()) {
             while (dstIterator.hasNext())
                 list.add(dstIterator.next());
-            return new SlashDelimitedPath(list, false, true);
+            return new SlashDelimitedPath(list, false);
         }
 
         /*
@@ -223,7 +221,7 @@ public final class SlashDelimitedPath
          */
         for (; srcIterator.hasNext(); srcIterator.next())
             list.add(PARENT);
-        return new SlashDelimitedPath(list, false, false);
+        return new SlashDelimitedPath(list, false);
     }
 
     @Override
