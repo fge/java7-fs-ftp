@@ -16,10 +16,9 @@
  * - ASL 2.0: http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package com.github.fge.ftpfs;
+package com.github.fge.ftpfs.path;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -41,61 +40,35 @@ import java.util.regex.Pattern;
  * (ie, begins with a {@code /}) and normalized (ie, there is no {@code .} or
  * {@code ..} in path components).</p>
  */
-public final class SlashDelimitedPath
+public abstract class SlashDelimitedPath
 {
-    private static final SlashDelimitedPath EMPTY = new SlashDelimitedPath();
+    protected static final char SLASH = '/';
 
-    private static final char SLASH = '/';
-
-    private static final String SELF = ".";
-    private static final String PARENT = "..";
+    protected static final String SELF = ".";
+    protected static final String PARENT = "..";
 
     private static final Pattern SLASHES = Pattern.compile("/+");
-
-    private final String asString;
-    private final List<String> components;
-
-    private final boolean absolute;
-    private final boolean normalized;
 
     public static SlashDelimitedPath fromString(final String input)
     {
         Objects.requireNonNull(input, "null argument is not allowed");
-        return input.isEmpty() ? EMPTY
-            : new SlashDelimitedPath(input);
-    }
 
-    private SlashDelimitedPath()
-    {
-        asString = "";
-        components = Collections.emptyList();
-        absolute = false;
-        normalized = true;
-    }
+        if (input.isEmpty())
+            return EmptySlashDelimitedPath.INSTANCE;
 
-    private SlashDelimitedPath(final String input)
-    {
-        absolute = !input.isEmpty() && input.charAt(0) == SLASH;
+        String s = input;
+        final boolean absolute = s.charAt(0) == '/';
+        if (absolute)
+            s = SLASHES.matcher(input).replaceFirst("");
 
-        final StringBuilder sb = new StringBuilder();
+        if (s.isEmpty())
+            return RootSlashDelimitedPath.INSTANCE;
 
-        final List<String> list = new ArrayList<>();
-        boolean isNormalized = true;
+        final List<String> components = Arrays.asList(SLASHES.split(s));
+        final boolean normalized = !(components.contains(SELF)
+            || components.contains(PARENT));
 
-        for (final String component: SLASHES.split(input))  {
-            if (component.isEmpty())
-                continue;
-            if (SELF.equals(component) || PARENT.equals(component))
-                isNormalized = false;
-            list.add(component);
-            sb.append(SLASH).append(component);
-        }
-
-        components = Collections.unmodifiableList(list);
-        normalized = isNormalized;
-        if (!absolute)
-            sb.deleteCharAt(0);
-        asString = sb.toString();
+        return new FullSlashDelimitedPath(absolute, normalized, components);
     }
 
     /**
@@ -105,10 +78,7 @@ public final class SlashDelimitedPath
      *
      * @return true if the path is absolute
      */
-    public boolean isAbsolute()
-    {
-        return absolute;
-    }
+    public abstract boolean isAbsolute();
 
     /**
      * Is this path normalized?
@@ -118,14 +88,8 @@ public final class SlashDelimitedPath
      *
      * @return true if the path is normalized
      */
-    public boolean isNormalized()
-    {
-        return normalized;
-    }
+    public abstract boolean isNormalized();
 
     @Override
-    public String toString()
-    {
-        return asString;
-    }
+    public abstract String toString();
 }

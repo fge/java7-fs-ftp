@@ -16,8 +16,9 @@
  * - ASL 2.0: http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package com.github.fge.ftpfs;
+package com.github.fge.ftpfs.path;
 
+import com.github.fge.ftpfs.path.SlashDelimitedPath;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
