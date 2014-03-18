@@ -18,9 +18,11 @@
 
 package com.github.fge.ftpfs.path;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -129,6 +131,30 @@ public final class SlashDelimitedPath
         list.addAll(other.components);
         return new SlashDelimitedPath(list, absolute,
             normalized && other.normalized);
+    }
+
+    public SlashDelimitedPath normalize()
+    {
+        if (normalized)
+            return this;
+        final Deque<String> deque = new ArrayDeque<>();
+        int nrComponents = 0;
+        boolean isParent;
+        for (final String component: components) {
+            if (SELF.equals(component))
+                continue;
+            isParent = PARENT.equals(component);
+            if (isParent && nrComponents > 0) {
+                deque.pollLast();
+                nrComponents--;
+                continue;
+            }
+            deque.add(component);
+            if (!isParent)
+                nrComponents++;
+        }
+
+        return new SlashDelimitedPath(new ArrayList<>(deque), absolute, true);
     }
 
     @Override
