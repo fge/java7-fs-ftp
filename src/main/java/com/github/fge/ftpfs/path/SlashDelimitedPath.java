@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -151,6 +152,78 @@ public final class SlashDelimitedPath
         }
 
         return new SlashDelimitedPath(new ArrayList<>(deque), absolute, true);
+    }
+
+    /*
+     * FIXME: the results of native Unix Path's relativization is most bizarre
+     * (buggy?) if any one is not normalized; here we only take normalized paths
+     *
+     * Also, it refuses to relativize if one path is absolute and the other
+     * relative.
+     *
+     * We mimic this behaviour here.
+     */
+    public SlashDelimitedPath relativize(final SlashDelimitedPath other)
+    {
+        if (absolute ^ other.absolute)
+            throw new IllegalArgumentException("both paths must be either " +
+                "relative or absolute");
+
+        final SlashDelimitedPath src = normalized ? this : normalize();
+        final SlashDelimitedPath dst = other.normalized ? other
+            : other.normalize();
+
+        if (src.equals(dst))
+            return new SlashDelimitedPath(Collections.<String>emptyList(),
+                false, true);
+
+        final List<String> list = new ArrayList<>();
+
+        final ListIterator<String> srcIterator = src.components.listIterator();
+        final ListIterator<String> dstIterator = dst.components.listIterator();
+
+        String srcComponent, dstComponent;
+
+        /*
+         * FIRST STEP
+         *
+         * While both iterators are not empty, grab the next component of both.
+         *
+         * If both are equal, nothing to do. If there is a difference, it means
+         * we need to go to the parent directory, and advance only the source
+         * iterator.
+         */
+        while (srcIterator.hasNext() && dstIterator.hasNext()) {
+            srcComponent = srcIterator.next();
+            dstComponent = dstIterator.next();
+            if (srcComponent.equals(dstComponent))
+                continue;
+            list.add(PARENT);
+            dstIterator.previous();
+        }
+
+        /*
+         * SECOND STEP
+         *
+         * When we are here, either the source or the destination iterator is
+         * empty.
+         *
+         * If it is the source iterator, it means we need to add the remaining
+         * components of the destination iterator to reach the path.
+         */
+        if (!srcIterator.hasNext()) {
+            while (dstIterator.hasNext())
+                list.add(dstIterator.next());
+            return new SlashDelimitedPath(list, false, true);
+        }
+
+        /*
+         * If it is the destination iterator which is empty, we need to go up
+         * as many levels are as left in the parent.
+         */
+        for (; srcIterator.hasNext(); srcIterator.next())
+            list.add(PARENT);
+        return new SlashDelimitedPath(list, false, false);
     }
 
     @Override
