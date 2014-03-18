@@ -18,7 +18,10 @@
 
 package com.github.fge.ftpfs.path;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -40,8 +43,14 @@ import java.util.regex.Pattern;
  * (ie, begins with a {@code /}) and normalized (ie, there is no {@code .} or
  * {@code ..} in path components).</p>
  */
-public abstract class SlashDelimitedPath
+public final class SlashDelimitedPath
+    implements Iterable<String>
 {
+    private static final SlashDelimitedPath ROOT
+        = new SlashDelimitedPath(Collections.<String>emptyList(), true, true);
+    private static final SlashDelimitedPath EMPTY
+        = new SlashDelimitedPath(Collections.<String>emptyList(), false, true);
+
     protected static final char SLASH = '/';
 
     protected static final String SELF = ".";
@@ -49,12 +58,27 @@ public abstract class SlashDelimitedPath
 
     private static final Pattern SLASHES = Pattern.compile("/+");
 
+    protected final List<String> components;
+    private final String asString;
+
+    protected final boolean absolute;
+    protected final boolean normalized;
+
+    private SlashDelimitedPath(final List<String> components,
+        final boolean absolute, final boolean normalized)
+    {
+        this.components = Collections.unmodifiableList(components);
+        this.absolute = absolute;
+        this.normalized = normalized;
+        asString = toString(absolute, components);
+    }
+
     public static SlashDelimitedPath fromString(final String input)
     {
         Objects.requireNonNull(input, "null argument is not allowed");
 
         if (input.isEmpty())
-            return EmptySlashDelimitedPath.INSTANCE;
+            return EMPTY;
 
         String s = input;
         final boolean absolute = s.charAt(0) == '/';
@@ -62,13 +86,12 @@ public abstract class SlashDelimitedPath
             s = SLASHES.matcher(input).replaceFirst("");
 
         if (s.isEmpty())
-            return RootSlashDelimitedPath.INSTANCE;
+            return ROOT;
 
         final List<String> components = Arrays.asList(SLASHES.split(s));
         final boolean normalized = !(components.contains(SELF)
             || components.contains(PARENT));
-
-        return new FullSlashDelimitedPath(absolute, normalized, components);
+        return new SlashDelimitedPath(components, absolute, normalized);
     }
 
     /**
@@ -78,7 +101,10 @@ public abstract class SlashDelimitedPath
      *
      * @return true if the path is absolute
      */
-    public abstract boolean isAbsolute();
+    public boolean isAbsolute()
+    {
+        return absolute;
+    }
 
     /**
      * Is this path normalized?
@@ -88,25 +114,66 @@ public abstract class SlashDelimitedPath
      *
      * @return true if the path is normalized
      */
-    public abstract boolean isNormalized();
-
-    @Override
-    public final int hashCode()
+    public boolean isNormalized()
     {
-        return toString().hashCode();
+        return normalized;
+    }
+
+    public SlashDelimitedPath resolve(final SlashDelimitedPath other)
+    {
+        if (other.absolute)
+            return other;
+        if (other.components.isEmpty())
+            return this;
+        final List<String> list = new ArrayList<>(components);
+        list.addAll(other.components);
+        return new SlashDelimitedPath(list, absolute,
+            normalized && other.normalized);
     }
 
     @Override
-    public final boolean equals(final Object obj)
+    public Iterator<String> iterator()
+    {
+        return components.iterator();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return asString.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj)
     {
         if (obj == null)
             return false;
         if (this == obj)
             return true;
-        return obj instanceof SlashDelimitedPath
-            && toString().equals(obj.toString());
+        if (getClass() != obj.getClass())
+            return false;
+        final SlashDelimitedPath other = (SlashDelimitedPath) obj;
+        return asString.equals(other.asString);
     }
 
     @Override
-    public abstract String toString();
+    public String toString()
+    {
+        return asString;
+    }
+
+    private static String toString(final boolean absolute,
+        final List<String> list)
+    {
+        final String s = absolute ? "/" : "";
+        if (list.isEmpty())
+            return s;
+        final StringBuilder sb = new StringBuilder(s).append(list.get(0));
+        final int size = list.size();
+
+        for (int i = 1; i < size; i++)
+            sb.append('/').append(list.get(i));
+
+        return sb.toString();
+    }
 }
