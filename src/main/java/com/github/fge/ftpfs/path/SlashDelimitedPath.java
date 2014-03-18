@@ -53,10 +53,8 @@ public final class SlashDelimitedPath
     private static final SlashDelimitedPath EMPTY
         = new SlashDelimitedPath(Collections.<String>emptyList(), false, true);
 
-    protected static final char SLASH = '/';
-
-    protected static final String SELF = ".";
-    protected static final String PARENT = "..";
+    private static final String SELF = ".";
+    private static final String PARENT = "..";
 
     private static final Pattern SLASHES = Pattern.compile("/+");
 
