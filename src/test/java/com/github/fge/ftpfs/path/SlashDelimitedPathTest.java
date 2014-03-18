@@ -18,7 +18,6 @@
 
 package com.github.fge.ftpfs.path;
 
-import com.github.fge.ftpfs.path.SlashDelimitedPath;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -77,6 +76,7 @@ public final class SlashDelimitedPathTest
         list.add(new Object[] { "/foo/bar", true, true });
         list.add(new Object[] { "/foo/..", true, false });
         list.add(new Object[] { "/foo/.", true, false });
+        list.add(new Object[] { "foo", false, true });
         return list.iterator();
     }
 
