@@ -31,10 +31,17 @@ import java.util.Set;
 public final class FTPFileSystem
     extends FileSystem
 {
+    private final FTPFileSystemProvider provider;
+
+    public FTPFileSystem(FTPFileSystemProvider provider)
+    {
+        this.provider = provider;
+    }
+
     @Override
     public FileSystemProvider provider()
     {
-        return null;
+        return provider;
     }
 
     @Override
@@ -59,7 +66,7 @@ public final class FTPFileSystem
     @Override
     public String getSeparator()
     {
-        return null;
+        return "/";
     }
 
     @Override

@@ -42,7 +42,7 @@ public final class FTPFileSystemProvider
     @Override
     public String getScheme()
     {
-        return null;
+        return "ftp";
     }
 
     @Override

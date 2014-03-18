@@ -32,10 +32,17 @@ import java.util.Iterator;
 public final class FTPPath
     implements Path
 {
+    private final FTPFileSystem fs;
+
+    public FTPPath(FTPFileSystem fs)
+    {
+        this.fs = fs;
+    }
+
     @Override
     public FileSystem getFileSystem()
     {
-        return null;
+        return fs;
     }
 
     @Override
