@@ -27,7 +27,7 @@ import java.util.List;
 
 import static org.testng.Assert.*;
 
-public final class SlashDelimitedPathNormalizeTest
+public final class SlashPathNormalizeTest
 {
     @DataProvider
     public Iterator<Object[]> resolveData()
@@ -55,9 +55,9 @@ public final class SlashDelimitedPathNormalizeTest
     @Test(dataProvider = "resolveData")
     public void pathNormalizeWorks(final String input, final String result)
     {
-        final SlashDelimitedPath orig = SlashDelimitedPath.fromString(input);
-        final SlashDelimitedPath expected
-            = SlashDelimitedPath.fromString(result);
+        final SlashPath orig = SlashPath.fromString(input);
+        final SlashPath expected
+            = SlashPath.fromString(result);
         assertEquals(orig.normalize(), expected);
         assertTrue(expected.isNormalized());
     }

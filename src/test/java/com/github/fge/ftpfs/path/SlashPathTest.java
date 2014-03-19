@@ -27,13 +27,13 @@ import java.util.List;
 
 import static org.testng.Assert.*;
 
-public final class SlashDelimitedPathTest
+public final class SlashPathTest
 {
     @Test
     public void constructorRefusesNullArguments()
     {
         try {
-            SlashDelimitedPath.fromString(null);
+            SlashPath.fromString(null);
             fail("No exception thrown!");
         } catch (NullPointerException e) {
             assertEquals(e.getMessage(), "null argument is not allowed");
@@ -63,7 +63,7 @@ public final class SlashDelimitedPathTest
     public void constructorRemovesExtraSlashes(final String input,
         final String expected)
     {
-        final SlashDelimitedPath path = SlashDelimitedPath.fromString(input);
+        final SlashPath path = SlashPath.fromString(input);
 
         assertEquals(path.toString(), expected);
     }
@@ -72,8 +72,8 @@ public final class SlashDelimitedPathTest
     public void hashCodeAndEqualsWork(final String first,
         final String second)
     {
-        final SlashDelimitedPath p1 = SlashDelimitedPath.fromString(first);
-        final SlashDelimitedPath p2 = SlashDelimitedPath.fromString(second);
+        final SlashPath p1 = SlashPath.fromString(first);
+        final SlashPath p2 = SlashPath.fromString(second);
         assertTrue(p1.equals(p2));
         assertTrue(p2.equals(p1));
         assertEquals(p1.hashCode(), p2.hashCode());
@@ -82,7 +82,7 @@ public final class SlashDelimitedPathTest
     @Test
     public void basicEqualsHashCodeContractIsRespected()
     {
-        final SlashDelimitedPath path = SlashDelimitedPath.fromString("foo");
+        final SlashPath path = SlashPath.fromString("foo");
         assertTrue(path.equals(path));
         assertFalse(path.equals(null));
         assertFalse(path.equals(new Object()));
@@ -108,7 +108,7 @@ public final class SlashDelimitedPathTest
         final String input, final boolean absolute, final boolean normalized
     )
     {
-        final SlashDelimitedPath path = SlashDelimitedPath.fromString(input);
+        final SlashPath path = SlashPath.fromString(input);
         assertEquals(path.isAbsolute(), absolute);
         assertEquals(path.isNormalized(), normalized);
     }

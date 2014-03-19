@@ -27,7 +27,7 @@ import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
-public final class SlashDelimitedPathResolveTest
+public final class SlashPathResolveTest
 {
     @DataProvider
     public Iterator<Object[]> resolveData()
@@ -53,10 +53,10 @@ public final class SlashDelimitedPathResolveTest
     public void pathResolveWorks(final String first, final String second,
         final String result)
     {
-        final SlashDelimitedPath p1 = SlashDelimitedPath.fromString(first);
-        final SlashDelimitedPath p2 = SlashDelimitedPath.fromString(second);
-        final SlashDelimitedPath expected
-            = SlashDelimitedPath.fromString(result);
+        final SlashPath p1 = SlashPath.fromString(first);
+        final SlashPath p2 = SlashPath.fromString(second);
+        final SlashPath expected
+            = SlashPath.fromString(result);
 
         assertEquals(p1.resolve(p2), expected);
     }

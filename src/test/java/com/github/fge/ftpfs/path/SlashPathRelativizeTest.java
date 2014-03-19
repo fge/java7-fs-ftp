@@ -27,7 +27,7 @@ import java.util.List;
 
 import static org.testng.Assert.*;
 
-public final class SlashDelimitedPathRelativizeText
+public final class SlashPathRelativizeTest
 {
     @DataProvider
     public Iterator<Object[]> relativizeData()
@@ -49,9 +49,9 @@ public final class SlashDelimitedPathRelativizeText
     public void relativizationWorksAsExpected(final String srcpath,
         final String dstpath, final String relpath)
     {
-        final SlashDelimitedPath src = SlashDelimitedPath.fromString(srcpath);
-        final SlashDelimitedPath dst = SlashDelimitedPath.fromString(dstpath);
-        final SlashDelimitedPath rel = SlashDelimitedPath.fromString(relpath);
+        final SlashPath src = SlashPath.fromString(srcpath);
+        final SlashPath dst = SlashPath.fromString(dstpath);
+        final SlashPath rel = SlashPath.fromString(relpath);
 
         assertEquals(src.relativize(dst), rel);
         assertEquals(src.relativize(src.resolve(rel)), rel);
@@ -60,8 +60,8 @@ public final class SlashDelimitedPathRelativizeText
     @Test
     public void pathsMustBothBeAbsoluteOrRelative()
     {
-        final SlashDelimitedPath p1 = SlashDelimitedPath.fromString("/abs");
-        final SlashDelimitedPath p2 = SlashDelimitedPath.fromString("rel");
+        final SlashPath p1 = SlashPath.fromString("/abs");
+        final SlashPath p2 = SlashPath.fromString("rel");
 
         try {
             p1.relativize(p2);

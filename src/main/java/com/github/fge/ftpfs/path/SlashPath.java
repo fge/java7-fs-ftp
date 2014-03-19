@@ -53,13 +53,13 @@ import java.util.regex.Pattern;
  *
  * @see Path
  */
-public final class SlashDelimitedPath
+public final class SlashPath
     implements Iterable<String>
 {
-    private static final SlashDelimitedPath ROOT
-        = new SlashDelimitedPath(Collections.<String>emptyList(), true);
-    private static final SlashDelimitedPath EMPTY
-        = new SlashDelimitedPath(Collections.<String>emptyList(), false);
+    private static final SlashPath ROOT
+        = new SlashPath(Collections.<String>emptyList(), true);
+    private static final SlashPath EMPTY
+        = new SlashPath(Collections.<String>emptyList(), false);
 
     private static final String SELF = ".";
     private static final String PARENT = "..";
@@ -72,8 +72,7 @@ public final class SlashDelimitedPath
     private final boolean absolute;
     private final boolean normalized;
 
-    private SlashDelimitedPath(final List<String> components,
-        final boolean absolute)
+    private SlashPath(final List<String> components, final boolean absolute)
     {
         this.components = Collections.unmodifiableList(components);
         this.absolute = absolute;
@@ -88,7 +87,7 @@ public final class SlashDelimitedPath
      * @return a new path
      * @throws NullPointerException input is null
      */
-    public static SlashDelimitedPath fromString(final String input)
+    public static SlashPath fromString(final String input)
     {
         Objects.requireNonNull(input, "null argument is not allowed");
 
@@ -104,7 +103,7 @@ public final class SlashDelimitedPath
             return ROOT;
 
         final List<String> components = Arrays.asList(SLASHES.split(s));
-        return new SlashDelimitedPath(components, absolute);
+        return new SlashPath(components, absolute);
     }
 
     /**
@@ -134,7 +133,7 @@ public final class SlashDelimitedPath
      * @return the resolved path
      * @see Path#resolve(Path)
      */
-    public SlashDelimitedPath resolve(final SlashDelimitedPath other)
+    public SlashPath resolve(final SlashPath other)
     {
         if (other.absolute)
             return other;
@@ -142,7 +141,7 @@ public final class SlashDelimitedPath
             return this;
         final List<String> list = new ArrayList<>(components);
         list.addAll(other.components);
-        return new SlashDelimitedPath(list, absolute);
+        return new SlashPath(list, absolute);
     }
 
     /**
@@ -156,7 +155,7 @@ public final class SlashDelimitedPath
      * @return a normalized path
      * @see Path#normalize()
      */
-    public SlashDelimitedPath normalize()
+    public SlashPath normalize()
     {
         if (normalized)
             return this;
@@ -177,7 +176,7 @@ public final class SlashDelimitedPath
                 nrComponents++;
         }
 
-        return new SlashDelimitedPath(new ArrayList<>(deque), absolute);
+        return new SlashPath(new ArrayList<>(deque), absolute);
     }
 
     /*
@@ -205,18 +204,18 @@ public final class SlashDelimitedPath
      *
      * @see Path#relativize(java.nio.file.Path)
      */
-    public SlashDelimitedPath relativize(final SlashDelimitedPath other)
+    public SlashPath relativize(final SlashPath other)
     {
         if (absolute ^ other.absolute)
             throw new IllegalArgumentException("both paths must be either " +
                 "relative or absolute");
 
-        final SlashDelimitedPath src = normalized ? this : normalize();
-        final SlashDelimitedPath dst = other.normalized ? other
+        final SlashPath src = normalized ? this : normalize();
+        final SlashPath dst = other.normalized ? other
             : other.normalize();
 
         if (src.equals(dst))
-            return new SlashDelimitedPath(Collections.<String>emptyList(), false);
+            return new SlashPath(Collections.<String>emptyList(), false);
 
         final List<String> list = new ArrayList<>();
 
@@ -255,7 +254,7 @@ public final class SlashDelimitedPath
         if (!srcIterator.hasNext()) {
             while (dstIterator.hasNext())
                 list.add(dstIterator.next());
-            return new SlashDelimitedPath(list, false);
+            return new SlashPath(list, false);
         }
 
         /*
@@ -264,7 +263,7 @@ public final class SlashDelimitedPath
          */
         for (; srcIterator.hasNext(); srcIterator.next())
             list.add(PARENT);
-        return new SlashDelimitedPath(list, false);
+        return new SlashPath(list, false);
     }
 
     @Override
@@ -288,7 +287,7 @@ public final class SlashDelimitedPath
             return true;
         if (getClass() != obj.getClass())
             return false;
-        final SlashDelimitedPath other = (SlashDelimitedPath) obj;
+        final SlashPath other = (SlashPath) obj;
         return asString.equals(other.asString);
     }
 

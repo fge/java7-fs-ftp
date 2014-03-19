@@ -18,7 +18,7 @@
 
 package com.github.fge.ftpfs;
 
-import com.github.fge.ftpfs.path.SlashDelimitedPath;
+import com.github.fge.ftpfs.path.SlashPath;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,9 +35,9 @@ public final class FTPPath
     implements Path
 {
     private final FTPFileSystem fs;
-    private final SlashDelimitedPath path;
+    private final SlashPath path;
 
-    public FTPPath(final FTPFileSystem fs, final SlashDelimitedPath path)
+    public FTPPath(final FTPFileSystem fs, final SlashPath path)
     {
         this.fs = fs;
         this.path = path;
