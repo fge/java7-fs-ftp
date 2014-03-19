@@ -18,6 +18,7 @@
 
 package com.github.fge.ftpfs.path;
 
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,9 +43,15 @@ import java.util.regex.Pattern;
  *     /foo/../bar}).</li>
  * </ul>
  *
- * <p>It also provides utility methods to tell whether the path is absolute
- * (ie, begins with a {@code /}) and normalized (ie, there is no {@code .} or
- * {@code ..} in path components).</p>
+ * <p>A path is considered <strong>absolute</strong> if it begins with a {@code
+ * /}. It is considered <strong>normalized</strong> if there are not dot path
+ * elements, and there are no parent path elements {@code ..} after a non parent
+ * path element (that is, {@code ..} is normalized, but {@code a/..} isn't).</p>
+ *
+ * <p>This class also contains methods to resolve and relativize paths to one
+ * another, and to normalize paths.</p>
+ *
+ * @see Path
  */
 public final class SlashDelimitedPath
     implements Iterable<String>
@@ -74,6 +81,13 @@ public final class SlashDelimitedPath
         asString = toString(absolute, components);
     }
 
+    /**
+     * Static factory method
+     *
+     * @param input the path as a string
+     * @return a new path
+     * @throws NullPointerException input is null
+     */
     public static SlashDelimitedPath fromString(final String input)
     {
         Objects.requireNonNull(input, "null argument is not allowed");
@@ -96,8 +110,6 @@ public final class SlashDelimitedPath
     /**
      * Is this path absolute?
      *
-     * <p>A path is absolute only if it begins with a {@code /}.</p>
-     *
      * @return true if the path is absolute
      */
     public boolean isAbsolute()
@@ -108,9 +120,6 @@ public final class SlashDelimitedPath
     /**
      * Is this path normalized?
      *
-     * <p>A path is normalized only if it has no {@code .} or {@code ..} path
-     * elements.</p>
-     *
      * @return true if the path is normalized
      */
     public boolean isNormalized()
@@ -118,6 +127,13 @@ public final class SlashDelimitedPath
         return normalized;
     }
 
+    /**
+     * Resolve this path against another path
+     *
+     * @param other the other path
+     * @return the resolved path
+     * @see Path#resolve(Path)
+     */
     public SlashDelimitedPath resolve(final SlashDelimitedPath other)
     {
         if (other.absolute)
@@ -129,6 +145,17 @@ public final class SlashDelimitedPath
         return new SlashDelimitedPath(list, absolute);
     }
 
+    /**
+     * Normalize this path
+     *
+     * <p>Normalization consists of removing all dots and simplifying parent
+     * entries where possible.</p>
+     *
+     * <p>For instance, normalizing {@code a/b/../c/.} returns {@code a/c}.</p>
+     *
+     * @return a normalized path
+     * @see Path#normalize()
+     */
     public SlashDelimitedPath normalize()
     {
         if (normalized)
@@ -161,6 +188,22 @@ public final class SlashDelimitedPath
      * relative.
      *
      * We mimic this behaviour here.
+     */
+
+    /**
+     * Relativize a path against the current path
+     *
+     * <p>Note that this does <strong>not</strong> behave the way {@link
+     * Path#relativize(java.nio.file.Path)} does; in particular, this method
+     * will always normalize both paths before calculating the relative path.
+     * </p>
+     *
+     * @param other the path to relativize against
+     * @return the relativized path
+     * @throws IllegalArgumentException one path is absolute and the other is
+     * not
+     *
+     * @see Path#relativize(java.nio.file.Path)
      */
     public SlashDelimitedPath relativize(final SlashDelimitedPath other)
     {
