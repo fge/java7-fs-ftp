@@ -72,7 +72,7 @@ public final class FTPPath
     @Override
     public Path getParent()
     {
-        return null;
+        return new FTPPath(fs, path.getParent());
     }
 
     @Override
@@ -88,21 +88,24 @@ public final class FTPPath
     }
 
     @Override
-    public Path subpath(int beginIndex, int endIndex)
+    public Path subpath(final int beginIndex, final int endIndex)
     {
-        return null;
+        return new FTPPath(fs, path.subpath(beginIndex, endIndex));
     }
 
     @Override
-    public boolean startsWith(Path other)
+    public boolean startsWith(final Path other)
     {
-        return false;
+        if (!fs.equals(other.getFileSystem()))
+            return false;
+        final FTPPath otherPath = (FTPPath) other;
+        return path.startsWith(otherPath.path);
     }
 
     @Override
-    public boolean startsWith(String other)
+    public boolean startsWith(final String other)
     {
-        return false;
+        return startsWith(new FTPPath(fs, SlashPath.fromString(other)));
     }
 
     @Override

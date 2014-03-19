@@ -317,6 +317,12 @@ public final class SlashPath
         return new SlashPath(components.subList(start, end), false);
     }
 
+    public boolean startsWith(final SlashPath other)
+    {
+        return !(absolute ^ other.absolute)
+            && Collections.indexOfSubList(components, other.components) == 0;
+    }
+
     @Override
     public int compareTo(final SlashPath o)
     {

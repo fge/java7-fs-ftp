@@ -255,4 +255,29 @@ public final class SlashPathTest
 
         assertEquals(path.subpath(start, end), expected);
     }
+
+    @DataProvider
+    public Iterator<Object[]> getStartsWithData()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { "/foo", "foo", false });
+        list.add(new Object[] { "foo", "/foo", false });
+        list.add(new Object[] { "/foo", "/foo", true });
+        list.add(new Object[] { "foo", "foo", true });
+        list.add(new Object[] { "foo/bar/baz", "foo", true });
+        list.add(new Object[] { "foo", "foo/bar/baz", false });
+        list.add(new Object[] { "foo/..", "foo", true });
+        return list.iterator();
+    }
+
+    @Test(dataProvider = "getStartsWithData")
+    public void startsWithWorksCorrectly(final String orig,
+        final String against, final boolean expected)
+    {
+        final SlashPath me = SlashPath.fromString(orig);
+        final SlashPath him = SlashPath.fromString(against);
+
+        assertEquals(me.startsWith(him), expected);
+    }
 }
