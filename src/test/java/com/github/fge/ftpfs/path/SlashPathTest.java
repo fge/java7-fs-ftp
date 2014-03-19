@@ -203,4 +203,55 @@ public final class SlashPathTest
 
         assertEquals(path.getParent(), expected);
     }
+
+    private static final SlashPath TESTPATH = SlashPath.fromString("/a/b/c");
+
+    @DataProvider
+    public Iterator<Object[]> getIllegalSubpathData()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { -1, 2, "illegal start index" });
+        list.add(new Object[] { 3, 2, "illegal start index" });
+        list.add(new Object[] { 0, -1, "end index must be greater than " +
+            "start index" });
+        list.add(new Object[] { 0, 4, "illegal end index" });
+        list.add(new Object[] { 2, 2, "end index must be greater than " +
+            "start index" });
+        return list.iterator();
+    }
+
+    @Test(dataProvider = "getIllegalSubpathData")
+    public void illegalSubpathIndicesThrowIAE(final int start, final int end,
+        final String message)
+    {
+        try {
+            TESTPATH.subpath(start, end);
+            fail("No exception thrown!");
+        } catch (IllegalArgumentException e) {
+            assertEquals(e.getMessage(), message);
+        }
+    }
+
+    @DataProvider
+    public Iterator<Object[]> getSubpathData()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { "x", 0, 1, "x" });
+        list.add(new Object[] { "/x", 0, 1, "x" });
+        list.add(new Object[] { "/a/b/c/d/e/f", 2, 6, "c/d/e/f" });
+        list.add(new Object[] { "/a/b/c/d/e/f", 0, 6, "a/b/c/d/e/f" });
+        return list.iterator();
+    }
+
+    @Test(dataProvider = "getSubpathData")
+    public void subpathWorksAsIntended(final String orig, final int start,
+        final int end, final String ret)
+    {
+        final SlashPath path = SlashPath.fromString(orig);
+        final SlashPath expected = SlashPath.fromString(ret);
+
+        assertEquals(path.subpath(start, end), expected);
+    }
 }

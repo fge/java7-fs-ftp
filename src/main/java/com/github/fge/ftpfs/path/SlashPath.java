@@ -305,6 +305,18 @@ public final class SlashPath
             absolute);
     }
 
+    public SlashPath subpath(final int start, final int end)
+    {
+        if (start < 0 || start >= components.size())
+            throw new IllegalArgumentException("illegal start index");
+        if (end <= start)
+            throw new IllegalArgumentException("end index must be greater " +
+                "than start index");
+        if (end > components.size())
+            throw new IllegalArgumentException("illegal end index");
+        return new SlashPath(components.subList(start, end), false);
+    }
+
     @Override
     public int compareTo(final SlashPath o)
     {
