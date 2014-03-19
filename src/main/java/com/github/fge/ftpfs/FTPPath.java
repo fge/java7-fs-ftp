@@ -26,6 +26,7 @@ import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.ProviderMismatchException;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
@@ -131,15 +132,20 @@ public final class FTPPath
     }
 
     @Override
-    public Path resolve(Path other)
+    public Path resolve(final Path other)
     {
-        return null;
+        if (!fs.provider().equals(other.getFileSystem().provider()))
+            throw new ProviderMismatchException();
+        if (other.isAbsolute())
+            return other;
+        final FTPPath otherPath = (FTPPath) other;
+        return new FTPPath(fs, path.resolve(otherPath.path));
     }
 
     @Override
-    public Path resolve(String other)
+    public Path resolve(final String other)
     {
-        return null;
+        return new FTPPath(fs, path.resolve(SlashPath.fromString(other)));
     }
 
     @Override
