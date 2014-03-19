@@ -152,10 +152,39 @@ public final class SlashPathTest
     }
 
     @DataProvider
+    public Iterator<Object[]> getIllegalNameData()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { "/1/2/3", -1, "invalid index -1" });
+        list.add(new Object[] { "/1/2/3", 3, "invalid index 3" });
+        list.add(new Object[] { "/", 0, "path has no elements" });
+        list.add(new Object[] { "/", -1, "path has no elements" });
+        list.add(new Object[] { "", 0, "path has no elements" });
+        return list.iterator();
+    }
+
+
+    @Test(dataProvider = "getIllegalNameData")
+    public void getNameWithIllegalArgumentsThrowsIAE(final String input,
+        final int index, final String message)
+    {
+        final SlashPath path = SlashPath.fromString(input);
+
+        try {
+            path.getName(index);
+            fail("No exception thrown!");
+        } catch (IllegalArgumentException e) {
+            assertEquals(e.getMessage(), message);
+        }
+    }
+
+    @DataProvider
     public Iterator<Object[]> getParentData()
     {
         final List<Object[]> list = new ArrayList<>();
 
+        list.add(new Object[] { "", null });
         list.add(new Object[] { "/", null });
         list.add(new Object[] { "/a", "/" });
         list.add(new Object[] { "a", null });
