@@ -242,6 +242,7 @@ public final class SlashPathTest
         list.add(new Object[] { "/x", 0, 1, "x" });
         list.add(new Object[] { "/a/b/c/d/e/f", 2, 6, "c/d/e/f" });
         list.add(new Object[] { "/a/b/c/d/e/f", 0, 6, "a/b/c/d/e/f" });
+        list.add(new Object[] { "/a/b/c/d/e/f", 1, 4, "b/c/d" });
         return list.iterator();
     }
 
