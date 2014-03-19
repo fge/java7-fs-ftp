@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.*;
 
 public final class SlashDelimitedPathRelativizeText
 {
@@ -55,5 +55,26 @@ public final class SlashDelimitedPathRelativizeText
 
         assertEquals(src.relativize(dst), rel);
         assertEquals(src.relativize(src.resolve(rel)), rel);
+    }
+
+    @Test
+    public void pathsMustBothBeAbsoluteOrRelative()
+    {
+        final SlashDelimitedPath p1 = SlashDelimitedPath.fromString("/abs");
+        final SlashDelimitedPath p2 = SlashDelimitedPath.fromString("rel");
+
+        try {
+            p1.relativize(p2);
+            fail("No exception thrown!");
+        } catch (IllegalArgumentException ignored) {
+            assertTrue(true);
+        }
+
+        try {
+            p2.relativize(p1);
+            fail("No exception thrown!");
+        } catch (IllegalArgumentException ignored) {
+            assertTrue(true);
+        }
     }
 }
