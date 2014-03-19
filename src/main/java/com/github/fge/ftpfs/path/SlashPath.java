@@ -328,6 +328,22 @@ public final class SlashPath
         return Collections.indexOfSubList(components, other.components) == 0;
     }
 
+    public boolean endsWith(final SlashPath other)
+    {
+        if (asString.equals(other.asString))
+            return true;
+        if (other.absolute)
+            return false;
+        if (other.components.isEmpty())
+            return false;
+        final int expected = components.size() - other.components.size();
+        if (expected < 0)
+            return false;
+        final int actual
+            = Collections.lastIndexOfSubList(components, other.components);
+        return expected == actual;
+    }
+
     @Override
     public int compareTo(final SlashPath o)
     {

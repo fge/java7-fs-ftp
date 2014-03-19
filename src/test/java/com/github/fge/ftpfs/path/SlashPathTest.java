@@ -283,4 +283,32 @@ public final class SlashPathTest
 
         assertEquals(me.startsWith(him), expected);
     }
+
+    @DataProvider
+    public Iterator<Object[]> getEndsWithData()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { "foo", "/foo", false });
+        list.add(new Object[] { "/foo", "foo", true });
+        list.add(new Object[] { "foo", "foo", true });
+        list.add(new Object[] { "/foo", "/foo", true });
+        list.add(new Object[] { "/foo/bar", "/bar", false });
+        list.add(new Object[] { "/foo/bar", "bar", true });
+        list.add(new Object[] { "foo/bar", "bar", true });
+        list.add(new Object[] { "foo/bar", "/bar", false });
+        list.add(new Object[] { "/a/b/c/d/e/f", "e/f", true });
+        list.add(new Object[] { "/a/b/c/d/e/f", "e/fg", false });
+        return list.iterator();
+    }
+
+    @Test(dataProvider = "getEndsWithData")
+    public void endsWithWorksCorrectly(final String orig,
+        final String against, final boolean expected)
+    {
+        final SlashPath me = SlashPath.fromString(orig);
+        final SlashPath him = SlashPath.fromString(against);
+
+        assertEquals(me.endsWith(him), expected);
+    }
 }

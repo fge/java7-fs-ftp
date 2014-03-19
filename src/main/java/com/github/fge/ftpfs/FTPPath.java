@@ -109,15 +109,18 @@ public final class FTPPath
     }
 
     @Override
-    public boolean endsWith(Path other)
+    public boolean endsWith(final Path other)
     {
-        return false;
+        if (!fs.equals(other.getFileSystem()))
+            return false;
+        final FTPPath otherPath = (FTPPath) other;
+        return path.endsWith(otherPath.path);
     }
 
     @Override
-    public boolean endsWith(String other)
+    public boolean endsWith(final String other)
     {
-        return false;
+        return endsWith(new FTPPath(fs, SlashPath.fromString(other)));
     }
 
     @Override
