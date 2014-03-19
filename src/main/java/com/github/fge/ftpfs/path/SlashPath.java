@@ -319,8 +319,13 @@ public final class SlashPath
 
     public boolean startsWith(final SlashPath other)
     {
-        return !(absolute ^ other.absolute)
-            && Collections.indexOfSubList(components, other.components) == 0;
+        if (asString.equals(other.asString))
+            return true;
+        if (absolute ^ other.absolute)
+            return false;
+        if (other.components.isEmpty())
+            return false;
+        return Collections.indexOfSubList(components, other.components) == 0;
     }
 
     @Override

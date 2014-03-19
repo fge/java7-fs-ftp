@@ -261,6 +261,8 @@ public final class SlashPathTest
     {
         final List<Object[]> list = new ArrayList<>();
 
+        list.add(new Object[] { "/foo", "", false });
+        list.add(new Object[] { "foo", "", false });
         list.add(new Object[] { "/foo", "foo", false });
         list.add(new Object[] { "foo", "/foo", false });
         list.add(new Object[] { "/foo", "/foo", true });
@@ -268,6 +270,7 @@ public final class SlashPathTest
         list.add(new Object[] { "foo/bar/baz", "foo", true });
         list.add(new Object[] { "foo", "foo/bar/baz", false });
         list.add(new Object[] { "foo/..", "foo", true });
+        list.add(new Object[] { "/", "/", true });
         return list.iterator();
     }
 
