@@ -272,28 +272,19 @@ public final class SlashDelimitedPath
 
     private static boolean isNormalized(final List<String> components)
     {
-        /*
-         * Note: Paths.get("").normalize() throws an
-         * ArrayIndexOutOfBoundsException; we don't
-         */
-        if (components.isEmpty())
-            return true;
+        boolean seenNonParent = false;
 
-        final int size = components.size();
-        int lastParent = -1, lastNonParent = -1;
-        String component;
-
-        for (int index = 0; index < size; index++) {
-            component = components.get(index);
+        for (final String component: components) {
             if (SELF.equals(component))
                 return false;
-            if (PARENT.equals(component))
-                lastParent = index;
-            else
-                lastNonParent = index;
+            if (!PARENT.equals(component)) {
+                seenNonParent = true;
+                continue;
+            }
+            if (seenNonParent)
+                return false;
         }
 
-        return lastParent == -1 || lastNonParent == -1
-            || lastNonParent > lastParent;
+        return true;
     }
 }
