@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
  * @see Path
  */
 public final class SlashPath
-    implements Iterable<String>
+    implements Comparable<SlashPath>, Iterable<String>
 {
     private static final SlashPath ROOT
         = new SlashPath(Collections.<String>emptyList(), true);
@@ -193,7 +193,7 @@ public final class SlashPath
      * Relativize a path against the current path
      *
      * <p>Note that this does <strong>not</strong> behave the way {@link
-     * Path#relativize(java.nio.file.Path)} does; in particular, this method
+     * Path#relativize(Path)} does; in particular, this method
      * will always normalize both paths before calculating the relative path.
      * </p>
      *
@@ -202,7 +202,7 @@ public final class SlashPath
      * @throws IllegalArgumentException one path is absolute and the other is
      * not
      *
-     * @see Path#relativize(java.nio.file.Path)
+     * @see Path#relativize(Path)
      */
     public SlashPath relativize(final SlashPath other)
     {
@@ -264,6 +264,38 @@ public final class SlashPath
         for (; srcIterator.hasNext(); srcIterator.next())
             list.add(PARENT);
         return new SlashPath(list, false);
+    }
+
+    /**
+     * Get the number of path elements in this path
+     *
+     * @return the number of path elements; 0 if path is empty or {@code /}
+     *
+     * @see Path#getNameCount()
+     */
+    public int getNameCount()
+    {
+        return components.size();
+    }
+
+    public SlashPath getName(final int index)
+    {
+        if (components.isEmpty())
+            throw new IllegalArgumentException("path has no elements");
+        if (index < 0 || index >= components.size())
+            throw new IllegalArgumentException("invalid index " + index);
+        return SlashPath.fromString(components.get(index));
+    }
+
+    public SlashPath getLastName()
+    {
+        return components.isEmpty() ? null : getName(components.size() - 1);
+    }
+
+    @Override
+    public int compareTo(final SlashPath o)
+    {
+        return asString.compareTo(o.asString);
     }
 
     @Override

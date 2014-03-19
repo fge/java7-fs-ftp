@@ -112,4 +112,42 @@ public final class SlashPathTest
         assertEquals(path.isAbsolute(), absolute);
         assertEquals(path.isNormalized(), normalized);
     }
+
+    @Test
+    public void getNameThrowsIAEOnEmptyPath()
+    {
+        try {
+            SlashPath.fromString("").getName(0);
+            fail("No exception thrown!");
+        } catch (IllegalArgumentException e) {
+            assertEquals(e.getMessage(), "path has no elements");
+        }
+    }
+
+    @DataProvider
+    public Iterator<Object[]> getNameData()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { "/a/b/c/d", 4, 2, "c", "d" });
+        list.add(new Object[] { "/a", 1, 0, "a", "a" });
+        list.add(new Object[] { "/a/..", 2, 0, "a", ".." });
+        list.add(new Object[] { "/a/../.", 3, 0, "a", "." });
+
+        return list.iterator();
+    }
+
+    @Test(dataProvider = "getNameData")
+    public void getNameAndLastNameWorkCorrectly(final String input,
+        final int nameCount, final int index, final String name,
+        final String lastName)
+    {
+        final SlashPath path = SlashPath.fromString(input);
+        final SlashPath component = SlashPath.fromString(name);
+        final SlashPath last = SlashPath.fromString(lastName);
+
+        assertEquals(path.getNameCount(), nameCount);
+        assertEquals(path.getName(index), component);
+        assertEquals(path.getLastName(), last);
+    }
 }
