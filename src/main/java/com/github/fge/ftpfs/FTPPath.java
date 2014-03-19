@@ -34,6 +34,8 @@ import java.util.Iterator;
 public final class FTPPath
     implements Path
 {
+    private static final SlashPath ROOT = SlashPath.fromString("/");
+
     private final FTPFileSystem fs;
     private final SlashPath path;
 
@@ -58,13 +60,13 @@ public final class FTPPath
     @Override
     public Path getRoot()
     {
-        return null;
+        return isAbsolute() ? new FTPPath(fs, ROOT) : null;
     }
 
     @Override
     public Path getFileName()
     {
-        return null;
+        return new FTPPath(fs, path.getLastName());
     }
 
     @Override
@@ -76,13 +78,13 @@ public final class FTPPath
     @Override
     public int getNameCount()
     {
-        return 0;
+        return path.getNameCount();
     }
 
     @Override
-    public Path getName(int index)
+    public Path getName(final int index)
     {
-        return null;
+        return new FTPPath(fs, path.getName(index));
     }
 
     @Override
@@ -161,20 +163,22 @@ public final class FTPPath
     @Override
     public Path toAbsolutePath()
     {
+        // TODO: how do you do that?
         return null;
     }
 
     @Override
-    public Path toRealPath(LinkOption... options)
+    public Path toRealPath(final LinkOption... options)
         throws IOException
     {
-        return null;
+        // TODO: symlink support
+        return toAbsolutePath();
     }
 
     @Override
     public File toFile()
     {
-        return null;
+        return new File(path.toString());
     }
 
     @Override
@@ -195,12 +199,33 @@ public final class FTPPath
     @Override
     public Iterator<Path> iterator()
     {
-        return null;
+        return new Iterator<Path>()
+        {
+            private final Iterator<String> it = path.iterator();
+
+            @Override
+            public boolean hasNext()
+            {
+                return it.hasNext();
+            }
+
+            @Override
+            public Path next()
+            {
+                return fs.getPath(it.next());
+            }
+
+            @Override
+            public void remove()
+            {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     @Override
-    public int compareTo(Path other)
+    public int compareTo(final Path other)
     {
-        return 0;
+        return path.toString().compareTo(other.toString());
     }
 }
