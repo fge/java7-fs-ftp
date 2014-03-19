@@ -18,6 +18,8 @@
 
 package com.github.fge.ftpfs;
 
+import com.github.fge.ftpfs.path.SlashDelimitedPath;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -33,10 +35,12 @@ public final class FTPPath
     implements Path
 {
     private final FTPFileSystem fs;
+    private final SlashDelimitedPath path;
 
-    public FTPPath(FTPFileSystem fs)
+    public FTPPath(final FTPFileSystem fs, final SlashDelimitedPath path)
     {
         this.fs = fs;
+        this.path = path;
     }
 
     @Override
@@ -48,7 +52,7 @@ public final class FTPPath
     @Override
     public boolean isAbsolute()
     {
-        return false;
+        return path.isAbsolute();
     }
 
     @Override
@@ -114,7 +118,8 @@ public final class FTPPath
     @Override
     public Path normalize()
     {
-        return null;
+        return path.isNormalized() ? this
+            : fs.getPath(path.normalize().toString());
     }
 
     @Override
