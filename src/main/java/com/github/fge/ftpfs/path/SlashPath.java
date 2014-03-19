@@ -292,6 +292,19 @@ public final class SlashPath
         return components.isEmpty() ? null : getName(components.size() - 1);
     }
 
+    // TODO: getRoot()?
+    public SlashPath getParent()
+    {
+        if (components.isEmpty())
+            return null;
+        if (components.size() == 1)
+            return absolute
+                ? new SlashPath(Collections.<String>emptyList(), true)
+                : null;
+        return new SlashPath(components.subList(0, components.size() - 1),
+            absolute);
+    }
+
     @Override
     public int compareTo(final SlashPath o)
     {

@@ -150,4 +150,28 @@ public final class SlashPathTest
         assertEquals(path.getName(index), component);
         assertEquals(path.getLastName(), last);
     }
+
+    @DataProvider
+    public Iterator<Object[]> getParentData()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { "/", null });
+        list.add(new Object[] { "/a", "/" });
+        list.add(new Object[] { "a", null });
+        list.add(new Object[] { "/a/b", "/a" });
+        list.add(new Object[] { "/a/b/..", "/a/b" });
+
+        return list.iterator();
+    }
+
+    @Test(dataProvider = "getParentData")
+    public void getParentWorks(final String input, final String output)
+    {
+        final SlashPath path = SlashPath.fromString(input);
+        final SlashPath expected = output == null ? null
+            : SlashPath.fromString(output);
+
+        assertEquals(path.getParent(), expected);
+    }
 }
