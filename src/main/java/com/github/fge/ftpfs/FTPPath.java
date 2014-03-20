@@ -38,11 +38,11 @@ public final class FTPPath
 {
     private static final SlashPath ROOT = SlashPath.fromString("/");
 
-    private final FTPFileSystem fs;
+    private final FileSystem fs;
     private final URI uri;
     private final SlashPath path;
 
-    public FTPPath(final FTPFileSystem fs, final URI uri, final SlashPath path)
+    public FTPPath(final FileSystem fs, final URI uri, final SlashPath path)
     {
         this.fs = fs;
         this.uri = uri;
