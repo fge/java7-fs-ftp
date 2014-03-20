@@ -281,4 +281,29 @@ public final class FTPPath
     {
         return path.toString().compareTo(other.toString());
     }
+
+    @Override
+    public int hashCode()
+    {
+        return 31 * uri.hashCode() + path.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj)
+    {
+        if (obj == null)
+            return false;
+        if (this == obj)
+            return true;
+        if (getClass() != obj.getClass())
+            return false;
+        final FTPPath other = (FTPPath) obj;
+        return uri.equals(other.uri) && path.equals(other.path);
+    }
+
+    @Override
+    public String toString()
+    {
+        return path.toString();
+    }
 }
