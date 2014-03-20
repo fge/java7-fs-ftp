@@ -183,14 +183,41 @@ public final class FTPPath
     @Override
     public URI toUri()
     {
-        return null;
+        /*
+         * This is a strange one...
+         *
+         * As an FTP user you have a root, and cannot go above it. We therefore
+         * normalize the path first, then remove all leading dot-dots.
+         */
+        final SlashPath normalized = path.normalize();
+        final Iterator<String> it = normalized.iterator();
+        final StringBuilder sb = new StringBuilder(uri.toString());
+
+        /*
+         * Skip leading dot-dots...
+         */
+        while (it.hasNext())
+            if (!"..".equals(it.next()))
+                break;
+
+        /*
+         * Swallow the rest
+         */
+        while (it.hasNext())
+            sb.append('/').append(it.next());
+
+        return URI.create(sb.toString());
     }
 
     @Override
     public Path toAbsolutePath()
     {
-        // TODO: how do you do that?
-        return null;
+        /*
+         * TODO: fix that...
+         *
+         * Can we have a non absolute path anyway?
+         */
+        return isAbsolute() ? this : new FTPPath(fs, uri, ROOT.resolve(path));
     }
 
     @Override
