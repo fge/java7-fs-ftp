@@ -46,7 +46,7 @@ public final class FTPFileSystemProvider
     }
 
     @Override
-    public FileSystem newFileSystem(URI uri, Map<String, ?> env)
+    public FileSystem newFileSystem(final URI uri, final Map<String, ?> env)
         throws IOException
     {
         return null;

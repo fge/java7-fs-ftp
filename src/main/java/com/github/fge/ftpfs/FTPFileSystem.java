@@ -19,6 +19,7 @@
 package com.github.fge.ftpfs;
 
 import com.github.fge.ftpfs.path.SlashPath;
+import com.github.fge.ftpfs.principals.DummyPrincipleLookupService;
 import com.github.fge.ftpfs.watch.NopWatchService;
 
 import java.io.IOException;
@@ -108,15 +109,16 @@ public final class FTPFileSystem
     }
 
     @Override
-    public PathMatcher getPathMatcher(String syntaxAndPattern)
+    public PathMatcher getPathMatcher(final String syntaxAndPattern)
     {
-        return null;
+        // TODO...
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public UserPrincipalLookupService getUserPrincipalLookupService()
     {
-        return null;
+        return new DummyPrincipleLookupService();
     }
 
     @Override
