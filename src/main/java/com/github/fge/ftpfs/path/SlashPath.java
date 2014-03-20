@@ -248,19 +248,12 @@ public final class SlashPath
          * When we are here, either the source or the destination iterator is
          * empty.
          *
-         * If it is the source iterator, it means we need to add the remaining
-         * components of the destination iterator to reach the path.
+         * Add the remaining components of the destination iterator (if any) to
+         * reach the path, then go up as many levels as there are remaining
+         * components in the source iterator.
          */
-        if (!srcIterator.hasNext()) {
-            while (dstIterator.hasNext())
-                list.add(dstIterator.next());
-            return new SlashPath(list, false);
-        }
-
-        /*
-         * If it is the destination iterator which is empty, we need to go up
-         * as many levels are as left in the parent.
-         */
+        while (dstIterator.hasNext())
+            list.add(dstIterator.next());
         for (; srcIterator.hasNext(); srcIterator.next())
             list.add(PARENT);
         return new SlashPath(list, false);
@@ -298,9 +291,7 @@ public final class SlashPath
         if (components.isEmpty())
             return null;
         if (components.size() == 1)
-            return absolute
-                ? new SlashPath(Collections.<String>emptyList(), true)
-                : null;
+            return absolute ? ROOT : null;
         return new SlashPath(components.subList(0, components.size() - 1),
             absolute);
     }
