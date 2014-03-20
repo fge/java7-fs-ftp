@@ -154,7 +154,7 @@ public final class FTPPathTest
     }
 
     @Test
-    public void getRootWorks()
+    public void getRootRespectsContract()
     {
         final SlashPath rootSlashPath = SlashPath.fromString("/");
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
@@ -169,7 +169,7 @@ public final class FTPPathTest
     }
 
     @Test
-    public void getParentWorks()
+    public void getParentRespectsContract()
     {
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
         final SlashPath slashPath2 = SlashPath.fromString("/a");
@@ -185,22 +185,17 @@ public final class FTPPathTest
     }
 
     @Test
-    public void getFileNameWorks()
+    public void getFileNameRespectsContract()
     {
-        final SlashPath slashPath1 = SlashPath.fromString("/a/b");
-        final SlashPath slashPath2 = SlashPath.fromString("b");
         final SlashPath rootSlashPath = SlashPath.fromString("/");
 
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs1, URI1, slashPath2);
         final FTPPath rootPath = new FTPPath(fs1, URI1, rootSlashPath);
 
-        assertEquals(path1.getFileName(), path2);
         assertNull(rootPath.getFileName());
     }
 
     @Test
-    public void resolveWorks()
+    public void resolveRespectsContract()
     {
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
         final SlashPath slashPath2 = SlashPath.fromString("b");
@@ -217,7 +212,7 @@ public final class FTPPathTest
     }
 
     @Test
-    public void resolveSiblingWorks()
+    public void resolveSiblingRespectsContract()
     {
         final SlashPath slashPath1 = SlashPath.fromString("/a");
         final SlashPath slashPath2 = SlashPath.fromString("/");
