@@ -14,6 +14,8 @@ project.ext {
  * List of dependencies
  */
 dependencies {
+    compile(group: "com.google.code.findbugs", name: "jsr305",
+        version: "2.0.1");
     compile(group: "commons-net", name: "commons-net", version: "3.3");
     testCompile(group: "org.testng", name: "testng", version: "6.8.7") {
         exclude(group: "junit", module: "junit");
@@ -25,6 +27,7 @@ dependencies {
         version: "2.4");
 }
 
-javadoc.options.links("http://docs.oracle.com/javase/7/docs/api");
+javadoc.options.links("http://jsr-305.googlecode.com/svn/trunk/javadoc");
+javadoc.options.links("http://docs.oracle.com/javase/8/docs/api");
 javadoc.options.links("http://commons.apache.org/proper/commons-net/apidocs/");
 
