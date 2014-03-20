@@ -65,6 +65,8 @@ public final class SlashPath
     private static final String PARENT = "..";
 
     private static final Pattern SLASHES = Pattern.compile("/+");
+    private static final Pattern LEADING_PARENTS
+        = Pattern.compile("^/+(?:\\.\\./+)*");
 
     private final List<String> components;
     private final String asString;
@@ -97,7 +99,7 @@ public final class SlashPath
         String s = input;
         final boolean absolute = s.charAt(0) == '/';
         if (absolute)
-            s = SLASHES.matcher(input).replaceFirst("");
+            s = LEADING_PARENTS.matcher(input).replaceFirst("");
 
         if (s.isEmpty())
             return ROOT;
