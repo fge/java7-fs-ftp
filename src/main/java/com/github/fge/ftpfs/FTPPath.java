@@ -191,17 +191,7 @@ public final class FTPPath
          * normalize the path first, then remove all leading dot-dots.
          */
         final SlashPath normalized = path.normalize();
-        final Iterator<String> it = normalized.iterator();
-        final StringBuilder sb = new StringBuilder(uri.toString());
-
-        /*
-         * Since the path has been normalized, we know the only possible
-         * remaining ".." are at the beginning.
-         */
-        for (final String component: normalized)
-            if (!"..".equals(component))
-                sb.append('/').append(component);
-        return URI.create(sb.toString());
+        return URI.create(uri.toString() + stripDotDots(normalized));
     }
 
     @Override
@@ -213,7 +203,7 @@ public final class FTPPath
          * Can we have a non absolute path anyway?
          */
         return isAbsolute() ? this
-            : new FTPPath(fs, uri, SlashPath.ROOT.resolve(path));
+            : new FTPPath(fs, uri, stripDotDots(path));
     }
 
     @Override
@@ -303,5 +293,15 @@ public final class FTPPath
     public String toString()
     {
         return path.toString();
+    }
+
+    private static SlashPath stripDotDots(final SlashPath path)
+    {
+        final int len = path.getNameCount();
+        int i = 0;
+        final Iterator<String> iterator = path.iterator();
+        while (iterator.hasNext() && "..".equals(iterator.next()))
+            i++;
+        return SlashPath.ROOT.resolve(path.subpath(i, len));
     }
 }
