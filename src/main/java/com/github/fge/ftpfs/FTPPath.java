@@ -202,8 +202,7 @@ public final class FTPPath
          *
          * Can we have a non absolute path anyway?
          */
-        return isAbsolute() ? this
-            : new FTPPath(fs, uri, stripDotDots(path));
+        return isAbsolute() ? this : new FTPPath(fs, uri, stripDotDots(path));
     }
 
     @Override
