@@ -19,6 +19,7 @@
 package com.github.fge.ftpfs;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -32,10 +33,12 @@ public final class FTPFileSystem
     extends FileSystem
 {
     private final FTPFileSystemProvider provider;
+    private final URI uri;
 
-    public FTPFileSystem(FTPFileSystemProvider provider)
+    public FTPFileSystem(final FTPFileSystemProvider provider, final URI uri)
     {
         this.provider = provider;
+        this.uri = uri; // already normalized
     }
 
     @Override

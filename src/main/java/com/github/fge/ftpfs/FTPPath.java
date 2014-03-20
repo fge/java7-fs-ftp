@@ -38,11 +38,13 @@ public final class FTPPath
     private static final SlashPath ROOT = SlashPath.fromString("/");
 
     private final FTPFileSystem fs;
+    private final URI uri;
     private final SlashPath path;
 
-    public FTPPath(final FTPFileSystem fs, final SlashPath path)
+    public FTPPath(final FTPFileSystem fs, final URI uri, final SlashPath path)
     {
         this.fs = fs;
+        this.uri = uri;
         this.path = path;
     }
 
@@ -61,20 +63,20 @@ public final class FTPPath
     @Override
     public Path getRoot()
     {
-        return isAbsolute() ? new FTPPath(fs, ROOT) : null;
+        return isAbsolute() ? new FTPPath(fs, uri, ROOT) : null;
     }
 
     @Override
     public Path getFileName()
     {
-        return new FTPPath(fs, path.getLastName());
+        return new FTPPath(fs, uri, path.getLastName());
     }
 
     @Override
     public Path getParent()
     {
         final SlashPath parent = path.getParent();
-        return parent == null ? null : new FTPPath(fs, parent);
+        return parent == null ? null : new FTPPath(fs, uri, parent);
     }
 
     @Override
@@ -86,13 +88,13 @@ public final class FTPPath
     @Override
     public Path getName(final int index)
     {
-        return new FTPPath(fs, path.getName(index));
+        return new FTPPath(fs, uri, path.getName(index));
     }
 
     @Override
     public Path subpath(final int beginIndex, final int endIndex)
     {
-        return new FTPPath(fs, path.subpath(beginIndex, endIndex));
+        return new FTPPath(fs, uri, path.subpath(beginIndex, endIndex));
     }
 
     @Override
@@ -107,7 +109,7 @@ public final class FTPPath
     @Override
     public boolean startsWith(final String other)
     {
-        return startsWith(new FTPPath(fs, SlashPath.fromString(other)));
+        return startsWith(new FTPPath(fs, uri, SlashPath.fromString(other)));
     }
 
     @Override
@@ -122,7 +124,7 @@ public final class FTPPath
     @Override
     public boolean endsWith(final String other)
     {
-        return endsWith(new FTPPath(fs, SlashPath.fromString(other)));
+        return endsWith(new FTPPath(fs, uri, SlashPath.fromString(other)));
     }
 
     @Override
@@ -140,13 +142,13 @@ public final class FTPPath
         if (other.isAbsolute())
             return other;
         final FTPPath otherPath = (FTPPath) other;
-        return new FTPPath(fs, path.resolve(otherPath.path));
+        return new FTPPath(fs, uri, path.resolve(otherPath.path));
     }
 
     @Override
     public Path resolve(final String other)
     {
-        return new FTPPath(fs, path.resolve(SlashPath.fromString(other)));
+        return new FTPPath(fs, uri, path.resolve(SlashPath.fromString(other)));
     }
 
     @Override
@@ -158,13 +160,14 @@ public final class FTPPath
         if (parent == null)
             return other;
         final FTPPath otherPath = (FTPPath) other;
-        return new FTPPath(fs, parent.resolve(otherPath.path));
+        return new FTPPath(fs, uri, parent.resolve(otherPath.path));
     }
 
     @Override
     public Path resolveSibling(final String other)
     {
-        final FTPPath otherPath = new FTPPath(fs, SlashPath.fromString(other));
+        final FTPPath otherPath
+            = new FTPPath(fs, uri, SlashPath.fromString(other));
         return resolveSibling(otherPath);
     }
 
@@ -174,7 +177,7 @@ public final class FTPPath
         if (!fs.provider().equals(other.getFileSystem().provider()))
             throw new ProviderMismatchException();
         final FTPPath otherPath = (FTPPath) other;
-        return new FTPPath(fs, path.relativize(otherPath.path));
+        return new FTPPath(fs, uri, path.relativize(otherPath.path));
     }
 
     @Override
