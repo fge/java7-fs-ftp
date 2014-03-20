@@ -195,18 +195,12 @@ public final class FTPPath
         final StringBuilder sb = new StringBuilder(uri.toString());
 
         /*
-         * Skip leading dot-dots...
+         * Since the path has been normalized, we know the only possible
+         * remaining ".." are at the beginning.
          */
-        while (it.hasNext())
-            if (!"..".equals(it.next()))
-                break;
-
-        /*
-         * Swallow the rest
-         */
-        while (it.hasNext())
-            sb.append('/').append(it.next());
-
+        for (final String component: normalized)
+            if (!"..".equals(component))
+                sb.append('/').append(component);
         return URI.create(sb.toString());
     }
 

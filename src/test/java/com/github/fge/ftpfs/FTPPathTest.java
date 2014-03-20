@@ -20,12 +20,16 @@ package com.github.fge.ftpfs;
 
 import com.github.fge.ftpfs.path.SlashPath;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.ProviderMismatchException;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
@@ -139,5 +143,29 @@ public final class FTPPathTest
         } catch (ProviderMismatchException ignored) {
             assertTrue(true);
         }
+    }
+
+    @DataProvider
+    public Iterator<Object[]> getURIData()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { "a", "ftp://my.site/sub/path/a" });
+        list.add(new Object[] { "/a", "ftp://my.site/sub/path/a" });
+        list.add(new Object[] { "/a/b", "ftp://my.site/sub/path/a/b" });
+        list.add(new Object[] { "../../a", "ftp://my.site/sub/path/a" });
+        list.add(new Object[] { "../a/../c/d", "ftp://my.site/sub/path/c/d" });
+
+        return list.iterator();
+    }
+
+    @Test(dataProvider = "getURIData")
+    public void getURIWorks(final String s, final String t)
+    {
+        final SlashPath slashPath = SlashPath.fromString(s);
+        final FTPPath path = new FTPPath(fs, URI1, slashPath);
+        final URI expected = URI.create(t);
+
+        assertEquals(path.toUri(), expected);
     }
 }
