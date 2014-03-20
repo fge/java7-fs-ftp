@@ -39,7 +39,6 @@ public final class FTPFileSystem
 {
     private final FTPFileSystemProvider provider;
     private final URI uri;
-    private final FTPPath root;
 
     private boolean open = true;
 
@@ -47,7 +46,6 @@ public final class FTPFileSystem
     {
         this.provider = provider;
         this.uri = uri; // already normalized
-        root = new FTPPath(this, uri, SlashPath.fromString("/"));
     }
 
     @Override
@@ -84,7 +82,7 @@ public final class FTPFileSystem
     @Override
     public Iterable<Path> getRootDirectories()
     {
-        return Collections.<Path>singleton(root);
+        return Collections.singleton(getPath("/"));
     }
 
     @Override
@@ -100,7 +98,7 @@ public final class FTPFileSystem
     }
 
     @Override
-    public Path getPath(String first, String... more)
+    public Path getPath(final String first, final String... more)
     {
         SlashPath path = SlashPath.fromString(first);
         for (final String component: more)
