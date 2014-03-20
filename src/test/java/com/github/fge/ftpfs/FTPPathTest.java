@@ -231,4 +231,25 @@ public final class FTPPathTest
         assertEquals(path2.resolveSibling(emptyPath), emptyPath,
             "path without parent resolving empty should return empty");
     }
+
+    @Test
+    public void relativizeRespectsContract()
+    {
+        final SlashPath slashPath1 = SlashPath.fromString("/a/b");
+        final SlashPath slashPath2 = SlashPath.fromString("b");
+        final SlashPath emptySlashPath = SlashPath.fromString("");
+
+        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
+        final FTPPath path2 = new FTPPath(fs1, URI1, slashPath2);
+        final FTPPath emptyPath = new FTPPath(fs1, URI1, emptySlashPath);
+
+        assertEquals(path1.relativize(path1), emptyPath);
+        assertEquals(path2.relativize(path2), emptyPath);
+        try {
+            path1.relativize(path2);
+            fail("No exception thrown!");
+        } catch (IllegalArgumentException e) {
+            assertTrue(true);
+        }
+    }
 }
