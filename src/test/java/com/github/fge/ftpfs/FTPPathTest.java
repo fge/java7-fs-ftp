@@ -209,15 +209,36 @@ public final class FTPPathTest
     {
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
         final SlashPath slashPath2 = SlashPath.fromString("b");
-        final SlashPath emptySlaslPath = SlashPath.fromString("");
+        final SlashPath emptySlashPath = SlashPath.fromString("");
 
         final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
         final FTPPath path2 = new FTPPath(fs1, URI1, slashPath2);
-        final FTPPath emptyPath = new FTPPath(fs1, URI1, emptySlaslPath);
+        final FTPPath emptyPath = new FTPPath(fs1, URI1, emptySlashPath);
 
         assertSame(path2.resolve(path1), path1,
             "resolving an absolute path should return other");
         assertSame(path2.resolve(emptyPath), path2,
             "resolving empty path should return this");
+    }
+
+    @Test
+    public void resolveSiblingWorks()
+    {
+        final SlashPath slashPath1 = SlashPath.fromString("/a");
+        final SlashPath slashPath2 = SlashPath.fromString("/");
+        final SlashPath emptySlashPath = SlashPath.fromString("");
+
+        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
+        final FTPPath path2 = new FTPPath(fs1, URI1, slashPath2);
+        final FTPPath emptyPath = new FTPPath(fs1, URI1, emptySlashPath);
+
+        assertSame(path2.resolveSibling(emptyPath), emptyPath,
+            "path without a parent should return other");
+        assertSame(path2.resolveSibling(path1), path1,
+            "resolving an absolute path should return other");
+        assertEquals(path1.resolveSibling(emptyPath), path2,
+            "resolving empty path as sibling should return parent");
+        assertEquals(path2.resolveSibling(emptyPath), emptyPath,
+            "path without parent resolving empty should return empty");
     }
 }
