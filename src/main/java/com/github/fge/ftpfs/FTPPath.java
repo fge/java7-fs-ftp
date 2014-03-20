@@ -19,6 +19,7 @@
 package com.github.fge.ftpfs;
 
 import com.github.fge.ftpfs.path.SlashPath;
+import com.github.fge.ftpfs.watch.NopWatchKey;
 
 import java.io.File;
 import java.io.IOException;
@@ -235,18 +236,20 @@ public final class FTPPath
     }
 
     @Override
-    public WatchKey register(WatchService watcher, WatchEvent.Kind<?>[] events,
-        WatchEvent.Modifier... modifiers)
+    public WatchKey register(final WatchService watcher,
+        final WatchEvent.Kind<?>[] events,
+        final WatchEvent.Modifier... modifiers)
         throws IOException
     {
-        return null;
+        return new NopWatchKey();
     }
 
     @Override
-    public WatchKey register(WatchService watcher, WatchEvent.Kind<?>... events)
+    public WatchKey register(final WatchService watcher,
+        final WatchEvent.Kind<?>... events)
         throws IOException
     {
-        return null;
+        return new NopWatchKey();
     }
 
     @Override

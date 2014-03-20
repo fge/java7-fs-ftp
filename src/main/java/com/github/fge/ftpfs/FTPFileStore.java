@@ -41,28 +41,28 @@ public final class FTPFileStore
     @Override
     public boolean isReadOnly()
     {
-        return false;
+        return true;
     }
 
     @Override
     public long getTotalSpace()
         throws IOException
     {
-        return 0;
+        return Long.MAX_VALUE;
     }
 
     @Override
     public long getUsableSpace()
         throws IOException
     {
-        return 0;
+        return Long.MAX_VALUE;
     }
 
     @Override
     public long getUnallocatedSpace()
         throws IOException
     {
-        return 0;
+        return Long.MAX_VALUE;
     }
 
     @Override

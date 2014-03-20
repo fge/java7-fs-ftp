@@ -18,6 +18,9 @@
 
 package com.github.fge.ftpfs;
 
+import com.github.fge.ftpfs.path.SlashPath;
+import com.github.fge.ftpfs.watch.NopWatchService;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileStore;
@@ -27,6 +30,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Collections;
 import java.util.Set;
 
 public final class FTPFileSystem
@@ -34,11 +38,15 @@ public final class FTPFileSystem
 {
     private final FTPFileSystemProvider provider;
     private final URI uri;
+    private final FTPPath root;
+
+    private boolean open = true;
 
     public FTPFileSystem(final FTPFileSystemProvider provider, final URI uri)
     {
         this.provider = provider;
         this.uri = uri; // already normalized
+        root = new FTPPath(this, uri, SlashPath.fromString("/"));
     }
 
     @Override
@@ -51,19 +59,19 @@ public final class FTPFileSystem
     public void close()
         throws IOException
     {
-
+        open = false;
     }
 
     @Override
     public boolean isOpen()
     {
-        return false;
+        return open;
     }
 
     @Override
     public boolean isReadOnly()
     {
-        return false;
+        return true;
     }
 
     @Override
@@ -75,7 +83,7 @@ public final class FTPFileSystem
     @Override
     public Iterable<Path> getRootDirectories()
     {
-        return null;
+        return Collections.<Path>singleton(root);
     }
 
     @Override
@@ -93,7 +101,10 @@ public final class FTPFileSystem
     @Override
     public Path getPath(String first, String... more)
     {
-        return null;
+        SlashPath path = SlashPath.fromString(first);
+        for (final String component: more)
+            path = path.resolve(SlashPath.fromString(component));
+        return new FTPPath(this, uri, path);
     }
 
     @Override
@@ -112,6 +123,6 @@ public final class FTPFileSystem
     public WatchService newWatchService()
         throws IOException
     {
-        return null;
+        return NopWatchService.INSTANCE;
     }
 }
