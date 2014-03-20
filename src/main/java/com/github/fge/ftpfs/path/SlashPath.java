@@ -56,9 +56,9 @@ import java.util.regex.Pattern;
 public final class SlashPath
     implements Comparable<SlashPath>, Iterable<String>
 {
-    private static final SlashPath ROOT
+    public static final SlashPath ROOT
         = new SlashPath(Collections.<String>emptyList(), true);
-    private static final SlashPath EMPTY
+    public static final SlashPath EMPTY
         = new SlashPath(Collections.<String>emptyList(), false);
 
     private static final String SELF = ".";
