@@ -73,7 +73,8 @@ public final class FTPPath
     @Override
     public Path getParent()
     {
-        return new FTPPath(fs, path.getParent());
+        final SlashPath parent = path.getParent();
+        return parent == null ? null : new FTPPath(fs, parent);
     }
 
     @Override
@@ -149,21 +150,31 @@ public final class FTPPath
     }
 
     @Override
-    public Path resolveSibling(Path other)
+    public Path resolveSibling(final Path other)
     {
-        return null;
+        if (!fs.provider().equals(other.getFileSystem().provider()))
+            throw new ProviderMismatchException();
+        final SlashPath parent = path.getParent();
+        if (parent == null)
+            return other;
+        final FTPPath otherPath = (FTPPath) other;
+        return new FTPPath(fs, parent.resolve(otherPath.path));
     }
 
     @Override
-    public Path resolveSibling(String other)
+    public Path resolveSibling(final String other)
     {
-        return null;
+        final FTPPath otherPath = new FTPPath(fs, SlashPath.fromString(other));
+        return resolveSibling(otherPath);
     }
 
     @Override
-    public Path relativize(Path other)
+    public Path relativize(final Path other)
     {
-        return null;
+        if (!fs.provider().equals(other.getFileSystem().provider()))
+            throw new ProviderMismatchException();
+        final FTPPath otherPath = (FTPPath) other;
+        return new FTPPath(fs, path.relativize(otherPath.path));
     }
 
     @Override
