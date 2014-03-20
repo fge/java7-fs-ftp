@@ -41,19 +41,15 @@ public final class FTPPathTest
 
 
     private FileSystem fs1;
-    private FileSystemProvider provider1;
     private FileSystem fs2;
-    private FileSystemProvider provider2;
 
     @BeforeClass
     public void init()
     {
         fs1 = mock(FileSystem.class);
-        provider1 = mock(FileSystemProvider.class);
-        when(fs1.provider()).thenReturn(provider1);
+        when(fs1.provider()).thenReturn(mock(FileSystemProvider.class));
         fs2 = mock(FileSystem.class);
-        provider2 = mock(FileSystemProvider.class);
-        when(fs2.provider()).thenReturn(provider2);
+        when(fs2.provider()).thenReturn(mock(FileSystemProvider.class));
     }
 
     @Test
@@ -68,7 +64,6 @@ public final class FTPPathTest
     {
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
         final SlashPath slashPath2 = SlashPath.fromString("/a");
-        final FileSystem fs2 = mock(FileSystem.class);
         final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
         final FTPPath path2 = new FTPPath(fs2, URI1, slashPath2);
         assertFalse(path1.startsWith(path2));
