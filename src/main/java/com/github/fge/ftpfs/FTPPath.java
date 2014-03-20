@@ -70,7 +70,8 @@ public final class FTPPath
     @Override
     public Path getFileName()
     {
-        return new FTPPath(fs, uri, path.getLastName());
+        final SlashPath name = path.getLastName();
+        return name == null ? null : new FTPPath(fs, uri, name);
     }
 
     @Override
