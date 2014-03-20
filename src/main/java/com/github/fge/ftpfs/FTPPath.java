@@ -36,8 +36,6 @@ import java.util.Iterator;
 public final class FTPPath
     implements Path
 {
-    private static final SlashPath ROOT = SlashPath.fromString("/");
-
     private final FileSystem fs;
     private final URI uri;
     private final SlashPath path;
@@ -64,7 +62,7 @@ public final class FTPPath
     @Override
     public Path getRoot()
     {
-        return isAbsolute() ? new FTPPath(fs, uri, ROOT) : null;
+        return isAbsolute() ? new FTPPath(fs, uri, SlashPath.ROOT) : null;
     }
 
     @Override
@@ -144,7 +142,8 @@ public final class FTPPath
         if (other.isAbsolute())
             return other;
         final FTPPath otherPath = (FTPPath) other;
-        return new FTPPath(fs, uri, path.resolve(otherPath.path));
+        return SlashPath.EMPTY.equals(otherPath.path) ? this
+            : new FTPPath(fs, uri, path.resolve(otherPath.path));
     }
 
     @Override
@@ -213,7 +212,8 @@ public final class FTPPath
          *
          * Can we have a non absolute path anyway?
          */
-        return isAbsolute() ? this : new FTPPath(fs, uri, ROOT.resolve(path));
+        return isAbsolute() ? this
+            : new FTPPath(fs, uri, SlashPath.ROOT.resolve(path));
     }
 
     @Override
