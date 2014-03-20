@@ -81,31 +81,33 @@ public final class FTPFileSystemProvider
     }
 
     @Override
-    public void createDirectory(Path dir, FileAttribute<?>... attrs)
+    public void createDirectory(final Path dir, final FileAttribute<?>... attrs)
         throws IOException
     {
-
+        throw new IllegalStateException();
     }
 
     @Override
-    public void delete(Path path)
+    public void delete(final Path path)
         throws IOException
     {
-
+        throw new IllegalStateException();
     }
 
     @Override
-    public void copy(Path source, Path target, CopyOption... options)
+    public void copy(final Path source, final Path target,
+        final CopyOption... options)
         throws IOException
     {
-
+        throw new IllegalStateException();
     }
 
     @Override
-    public void move(Path source, Path target, CopyOption... options)
+    public void move(final Path source, final Path target,
+        final CopyOption... options)
         throws IOException
     {
-
+        throw new IllegalStateException();
     }
 
     @Override
@@ -116,7 +118,7 @@ public final class FTPFileSystemProvider
     }
 
     @Override
-    public boolean isHidden(Path path)
+    public boolean isHidden(final Path path)
         throws IOException
     {
         return false;
@@ -160,10 +162,10 @@ public final class FTPFileSystemProvider
     }
 
     @Override
-    public void setAttribute(Path path, String attribute, Object value,
-        LinkOption... options)
+    public void setAttribute(final Path path, final String attribute,
+        final Object value, final LinkOption... options)
         throws IOException
     {
-
+        throw new IllegalStateException();
     }
 }
