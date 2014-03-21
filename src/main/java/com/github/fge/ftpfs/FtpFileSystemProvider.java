@@ -55,7 +55,8 @@ public final class FtpFileSystemProvider
     }
 
     @Override
-    public InputStream newInputStream(Path path, OpenOption... options)
+    public InputStream newInputStream(final Path path,
+        final OpenOption... options)
         throws IOException
     {
         // TODO
@@ -63,35 +64,37 @@ public final class FtpFileSystemProvider
     }
 
     @Override
-    public OutputStream newOutputStream(Path path, OpenOption... options)
+    public OutputStream newOutputStream(final Path path,
+        final OpenOption... options)
         throws IOException
     {
         throw new IllegalStateException();
     }
 
     @Override
-    public FileSystem getFileSystem(URI uri)
+    public FileSystem getFileSystem(final URI uri)
     {
         return null;
     }
 
     @Override
-    public Path getPath(URI uri)
+    public Path getPath(final URI uri)
     {
         return null;
     }
 
     @Override
-    public SeekableByteChannel newByteChannel(Path path,
-        Set<? extends OpenOption> options, FileAttribute<?>... attrs)
+    public SeekableByteChannel newByteChannel(final Path path,
+        final Set<? extends OpenOption> options,
+        final FileAttribute<?>... attrs)
         throws IOException
     {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir,
-        DirectoryStream.Filter<? super Path> filter)
+    public DirectoryStream<Path> newDirectoryStream(final Path dir,
+        final DirectoryStream.Filter<? super Path> filter)
         throws IOException
     {
         return null;
@@ -128,7 +131,7 @@ public final class FtpFileSystemProvider
     }
 
     @Override
-    public boolean isSameFile(Path path, Path path2)
+    public boolean isSameFile(final Path path, final Path path2)
         throws IOException
     {
         return false;
@@ -142,37 +145,37 @@ public final class FtpFileSystemProvider
     }
 
     @Override
-    public FileStore getFileStore(Path path)
+    public FileStore getFileStore(final Path path)
         throws IOException
     {
         return null;
     }
 
     @Override
-    public void checkAccess(Path path, AccessMode... modes)
+    public void checkAccess(final Path path, final AccessMode... modes)
         throws IOException
     {
 
     }
 
     @Override
-    public <V extends FileAttributeView> V getFileAttributeView(Path path,
-        Class<V> type, LinkOption... options)
+    public <V extends FileAttributeView> V getFileAttributeView(final Path path,
+        final Class<V> type, final LinkOption... options)
     {
         return null;
     }
 
     @Override
-    public <A extends BasicFileAttributes> A readAttributes(Path path,
-        Class<A> type, LinkOption... options)
+    public <A extends BasicFileAttributes> A readAttributes(final Path path,
+        final Class<A> type, final LinkOption... options)
         throws IOException
     {
         return null;
     }
 
     @Override
-    public Map<String, Object> readAttributes(Path path, String attributes,
-        LinkOption... options)
+    public Map<String, Object> readAttributes(final Path path,
+        final String attributes, final LinkOption... options)
         throws IOException
     {
         return null;
