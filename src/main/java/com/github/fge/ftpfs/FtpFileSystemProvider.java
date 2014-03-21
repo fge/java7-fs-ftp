@@ -36,7 +36,7 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
 
-public final class FTPFileSystemProvider
+public final class FtpFileSystemProvider
     extends FileSystemProvider
 {
     @Override

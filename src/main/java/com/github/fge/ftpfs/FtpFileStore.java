@@ -23,7 +23,7 @@ import java.nio.file.FileStore;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileStoreAttributeView;
 
-public final class FTPFileStore
+public final class FtpFileStore
     extends FileStore
 {
     @Override

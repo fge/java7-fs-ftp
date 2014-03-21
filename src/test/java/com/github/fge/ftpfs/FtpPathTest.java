@@ -34,7 +34,7 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
 
-public final class FTPPathTest
+public final class FtpPathTest
 {
     private static final URI URI1 = URI.create("ftp://my.site/sub/path");
     private static final SlashPath PATH1 = SlashPath.fromString("/foo/bar");
@@ -55,7 +55,7 @@ public final class FTPPathTest
     @Test
     public void pathKnowsWhatItsFileSystemIs()
     {
-        final FTPPath path = new FTPPath(fs1, URI1, PATH1);
+        final FtpPath path = new FtpPath(fs1, URI1, PATH1);
         assertSame(path.getFileSystem(), fs1);
     }
 
@@ -64,8 +64,8 @@ public final class FTPPathTest
     {
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
         final SlashPath slashPath2 = SlashPath.fromString("/a");
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs2, URI1, slashPath2);
+        final FtpPath path1 = new FtpPath(fs1, URI1, slashPath1);
+        final FtpPath path2 = new FtpPath(fs2, URI1, slashPath2);
         assertFalse(path1.startsWith(path2));
     }
 
@@ -74,8 +74,8 @@ public final class FTPPathTest
     {
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
         final SlashPath slashPath2 = SlashPath.fromString("b");
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs2, URI1, slashPath2);
+        final FtpPath path1 = new FtpPath(fs1, URI1, slashPath1);
+        final FtpPath path2 = new FtpPath(fs2, URI1, slashPath2);
         assertFalse(path1.endsWith(path2));
     }
 
@@ -85,8 +85,8 @@ public final class FTPPathTest
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
         final SlashPath slashPath2 = SlashPath.fromString("b");
 
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs2, URI1, slashPath2);
+        final FtpPath path1 = new FtpPath(fs1, URI1, slashPath1);
+        final FtpPath path2 = new FtpPath(fs2, URI1, slashPath2);
 
         try {
             path1.resolve(path2);
@@ -102,8 +102,8 @@ public final class FTPPathTest
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
         final SlashPath slashPath2 = SlashPath.fromString("b");
 
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs2, URI1, slashPath2);
+        final FtpPath path1 = new FtpPath(fs1, URI1, slashPath1);
+        final FtpPath path2 = new FtpPath(fs2, URI1, slashPath2);
 
         try {
             path1.resolveSibling(path2);
@@ -118,8 +118,8 @@ public final class FTPPathTest
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
         final SlashPath slashPath2 = SlashPath.fromString("b");
 
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs2, URI1, slashPath2);
+        final FtpPath path1 = new FtpPath(fs1, URI1, slashPath1);
+        final FtpPath path2 = new FtpPath(fs2, URI1, slashPath2);
 
         try {
             path1.relativize(path2);
@@ -147,7 +147,7 @@ public final class FTPPathTest
     public void getURIWorks(final String s, final String t)
     {
         final SlashPath slashPath = SlashPath.fromString(s);
-        final FTPPath path = new FTPPath(fs1, URI1, slashPath);
+        final FtpPath path = new FtpPath(fs1, URI1, slashPath);
         final URI expected = URI.create(t);
 
         assertEquals(path.toUri(), expected);
@@ -160,9 +160,9 @@ public final class FTPPathTest
         final SlashPath slashPath1 = SlashPath.fromString("/a/b");
         final SlashPath slashPath2 = SlashPath.fromString("b");
 
-        final FTPPath rootPath = new FTPPath(fs1, URI1, rootSlashPath);
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs1, URI1, slashPath2);
+        final FtpPath rootPath = new FtpPath(fs1, URI1, rootSlashPath);
+        final FtpPath path1 = new FtpPath(fs1, URI1, slashPath1);
+        final FtpPath path2 = new FtpPath(fs1, URI1, slashPath2);
 
         assertEquals(path1.getRoot(), rootPath);
         assertNull(path2.getRoot());
@@ -175,9 +175,9 @@ public final class FTPPathTest
         final SlashPath slashPath2 = SlashPath.fromString("/a");
         final SlashPath rootSlashPath = SlashPath.fromString("/");
 
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs1, URI1, slashPath2);
-        final FTPPath rootPath = new FTPPath(fs1, URI1, rootSlashPath);
+        final FtpPath path1 = new FtpPath(fs1, URI1, slashPath1);
+        final FtpPath path2 = new FtpPath(fs1, URI1, slashPath2);
+        final FtpPath rootPath = new FtpPath(fs1, URI1, rootSlashPath);
 
         assertEquals(path1.getParent(), path2);
         assertEquals(path2.getParent(), rootPath);
@@ -189,7 +189,7 @@ public final class FTPPathTest
     {
         final SlashPath rootSlashPath = SlashPath.fromString("/");
 
-        final FTPPath rootPath = new FTPPath(fs1, URI1, rootSlashPath);
+        final FtpPath rootPath = new FtpPath(fs1, URI1, rootSlashPath);
 
         assertNull(rootPath.getFileName());
     }
@@ -201,9 +201,9 @@ public final class FTPPathTest
         final SlashPath slashPath2 = SlashPath.fromString("b");
         final SlashPath emptySlashPath = SlashPath.fromString("");
 
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs1, URI1, slashPath2);
-        final FTPPath emptyPath = new FTPPath(fs1, URI1, emptySlashPath);
+        final FtpPath path1 = new FtpPath(fs1, URI1, slashPath1);
+        final FtpPath path2 = new FtpPath(fs1, URI1, slashPath2);
+        final FtpPath emptyPath = new FtpPath(fs1, URI1, emptySlashPath);
 
         assertSame(path2.resolve(path1), path1,
             "resolving an absolute path should return other");
@@ -218,9 +218,9 @@ public final class FTPPathTest
         final SlashPath slashPath2 = SlashPath.fromString("/");
         final SlashPath emptySlashPath = SlashPath.fromString("");
 
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs1, URI1, slashPath2);
-        final FTPPath emptyPath = new FTPPath(fs1, URI1, emptySlashPath);
+        final FtpPath path1 = new FtpPath(fs1, URI1, slashPath1);
+        final FtpPath path2 = new FtpPath(fs1, URI1, slashPath2);
+        final FtpPath emptyPath = new FtpPath(fs1, URI1, emptySlashPath);
 
         assertSame(path2.resolveSibling(emptyPath), emptyPath,
             "path without a parent should return other");
@@ -239,9 +239,9 @@ public final class FTPPathTest
         final SlashPath slashPath2 = SlashPath.fromString("b");
         final SlashPath emptySlashPath = SlashPath.fromString("");
 
-        final FTPPath path1 = new FTPPath(fs1, URI1, slashPath1);
-        final FTPPath path2 = new FTPPath(fs1, URI1, slashPath2);
-        final FTPPath emptyPath = new FTPPath(fs1, URI1, emptySlashPath);
+        final FtpPath path1 = new FtpPath(fs1, URI1, slashPath1);
+        final FtpPath path2 = new FtpPath(fs1, URI1, slashPath2);
+        final FtpPath emptyPath = new FtpPath(fs1, URI1, emptySlashPath);
 
         assertEquals(path1.relativize(path1), emptyPath);
         assertEquals(path2.relativize(path2), emptyPath);

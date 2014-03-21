@@ -34,15 +34,15 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.Collections;
 import java.util.Set;
 
-public final class FTPFileSystem
+public final class FtpFileSystem
     extends FileSystem
 {
-    private final FTPFileSystemProvider provider;
+    private final FtpFileSystemProvider provider;
     private final URI uri;
 
     private boolean open = true;
 
-    public FTPFileSystem(final FTPFileSystemProvider provider, final URI uri)
+    public FtpFileSystem(final FtpFileSystemProvider provider, final URI uri)
     {
         this.provider = provider;
         this.uri = uri; // already normalized
@@ -103,7 +103,7 @@ public final class FTPFileSystem
         SlashPath path = SlashPath.fromString(first);
         for (final String component: more)
             path = path.resolve(SlashPath.fromString(component));
-        return new FTPPath(this, uri, path);
+        return new FtpPath(this, uri, path);
     }
 
     @Override
