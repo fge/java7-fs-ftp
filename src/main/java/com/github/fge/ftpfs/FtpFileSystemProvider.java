@@ -19,6 +19,8 @@
 package com.github.fge.ftpfs;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AccessMode;
@@ -53,6 +55,21 @@ public final class FtpFileSystemProvider
     }
 
     @Override
+    public InputStream newInputStream(Path path, OpenOption... options)
+        throws IOException
+    {
+        // TODO
+        return super.newInputStream(path, options);
+    }
+
+    @Override
+    public OutputStream newOutputStream(Path path, OpenOption... options)
+        throws IOException
+    {
+        throw new IllegalStateException();
+    }
+
+    @Override
     public FileSystem getFileSystem(URI uri)
     {
         return null;
@@ -69,7 +86,7 @@ public final class FtpFileSystemProvider
         Set<? extends OpenOption> options, FileAttribute<?>... attrs)
         throws IOException
     {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
