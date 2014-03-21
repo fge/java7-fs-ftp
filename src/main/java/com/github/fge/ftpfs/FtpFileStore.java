@@ -19,23 +19,32 @@
 package com.github.fge.ftpfs;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.FileStore;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileStoreAttributeView;
 
 public final class FtpFileStore
     extends FileStore
 {
+    private final String name;
+
+    public FtpFileStore(final URI uri)
+    {
+        name = uri.toString();
+    }
+
     @Override
     public String name()
     {
-        return null;
+        return name;
     }
 
     @Override
     public String type()
     {
-        return null;
+        return "ftp";
     }
 
     @Override
@@ -67,28 +76,28 @@ public final class FtpFileStore
 
     @Override
     public boolean supportsFileAttributeView(
-        Class<? extends FileAttributeView> type)
+        final Class<? extends FileAttributeView> type)
     {
-        return false;
+        return type == BasicFileAttributeView.class;
     }
 
     @Override
-    public boolean supportsFileAttributeView(String name)
+    public boolean supportsFileAttributeView(final String name)
     {
-        return false;
+        return "basic".equals(name);
     }
 
     @Override
     public <V extends FileStoreAttributeView> V getFileStoreAttributeView(
-        Class<V> type)
+        final Class<V> type)
     {
         return null;
     }
 
     @Override
-    public Object getAttribute(String attribute)
+    public Object getAttribute(final String attribute)
         throws IOException
     {
-        return null;
+        throw new UnsupportedOperationException("no attributes are supported");
     }
 }

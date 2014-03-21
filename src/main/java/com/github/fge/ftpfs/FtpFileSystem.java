@@ -39,6 +39,7 @@ public final class FtpFileSystem
 {
     private final FtpFileSystemProvider provider;
     private final URI uri;
+    private final FileStore fileStore;
 
     private boolean open = true;
 
@@ -46,6 +47,7 @@ public final class FtpFileSystem
     {
         this.provider = provider;
         this.uri = uri; // already normalized
+        fileStore = new FtpFileStore(uri);
     }
 
     @Override
@@ -88,13 +90,13 @@ public final class FtpFileSystem
     @Override
     public Iterable<FileStore> getFileStores()
     {
-        return null;
+        return Collections.singletonList(fileStore);
     }
 
     @Override
     public Set<String> supportedFileAttributeViews()
     {
-        return null;
+        return Collections.singleton("basic");
     }
 
     @Override
