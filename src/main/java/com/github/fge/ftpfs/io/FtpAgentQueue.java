@@ -25,7 +25,7 @@ public final class FtpAgentQueue
 {
     private final BlockingQueue<FtpAgent> agents;
 
-    public FtpAgentQueue(final FtpAgentProvider provider, final int maxAgents)
+    public FtpAgentQueue(final FtpAgentFactory provider, final int maxAgents)
     {
         agents = new ArrayBlockingQueue<>(maxAgents);
         for (int i = 0; i < maxAgents; i++)

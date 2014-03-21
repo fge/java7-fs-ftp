@@ -30,12 +30,12 @@ import java.util.List;
 public abstract class FtpAgent
     implements Closeable
 {
-    private final FtpAgentQueue provider;
+    private final FtpAgentQueue queue;
 
-    protected FtpAgent(final FtpAgentQueue provider)
+    protected FtpAgent(final FtpAgentQueue queue)
         throws IOException
     {
-        this.provider = provider;
+        this.queue = queue;
     }
 
     public abstract BasicFileAttributeView getAttributeView(final String name)
@@ -83,7 +83,7 @@ public abstract class FtpAgent
     public final void close()
         throws IOException
     {
-        provider.pushBack(this);
+        queue.pushBack(this);
     }
 
     private final class FtpDirectoryIterator

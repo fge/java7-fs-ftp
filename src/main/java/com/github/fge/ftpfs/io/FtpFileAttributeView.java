@@ -18,7 +18,9 @@
 
 package com.github.fge.ftpfs.io;
 
-public interface FtpEntry
+import java.nio.file.attribute.BasicFileAttributeView;
+
+public interface FtpFileAttributeView
+    extends BasicFileAttributeView
 {
-    boolean isDirectory();
 }
