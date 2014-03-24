@@ -29,12 +29,15 @@ public final class FtpAgentQueue
     implements Closeable
 {
     private final BlockingQueue<FtpAgent> agents;
+    private final FtpConfiguration cfg;
 
-    public FtpAgentQueue(final FtpAgentFactory provider, final int maxAgents)
+    public FtpAgentQueue(final FtpAgentFactory provider,
+        final FtpConfiguration cfg, final int maxAgents)
     {
         agents = new ArrayBlockingQueue<>(maxAgents);
+        this.cfg = cfg;
         for (int i = 0; i < maxAgents; i++)
-            agents.add(provider.get());
+            agents.add(provider.get(this, cfg));
     }
 
     public FtpAgent getAgent()

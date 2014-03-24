@@ -20,5 +20,5 @@ package com.github.fge.ftpfs.io;
 
 public interface FtpAgentFactory
 {
-    FtpAgent get();
+    FtpAgent get(final FtpAgentQueue queue, final FtpConfiguration cfg);
 }

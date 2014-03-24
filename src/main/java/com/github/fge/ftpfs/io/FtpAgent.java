@@ -29,11 +29,13 @@ public abstract class FtpAgent
     implements Closeable
 {
     private final FtpAgentQueue queue;
+    private final FtpConfiguration cfg;
 
-    protected FtpAgent(final FtpAgentQueue queue)
+    protected FtpAgent(final FtpAgentQueue queue, final FtpConfiguration cfg)
         throws IOException
     {
         this.queue = queue;
+        this.cfg = cfg;
     }
 
     public abstract BasicFileAttributeView getAttributeView(final String name)
