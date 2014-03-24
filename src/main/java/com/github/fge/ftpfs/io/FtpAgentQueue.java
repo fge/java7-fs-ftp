@@ -18,10 +18,15 @@
 
 package com.github.fge.ftpfs.io;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public final class FtpAgentQueue
+    implements Closeable
 {
     private final BlockingQueue<FtpAgent> agents;
 
@@ -41,5 +46,25 @@ public final class FtpAgentQueue
     public void pushBack(final FtpAgent agent)
     {
         agents.add(agent);
+    }
+
+    @Override
+    public void close()
+        throws IOException
+    {
+        IOException toThrow = null;
+
+        final List<FtpAgent> list = new ArrayList<>();
+        agents.drainTo(list);
+        for (final FtpAgent agent: list)
+            try {
+                agent.disconnect();
+            } catch (IOException e) {
+                if (toThrow == null)
+                    toThrow = e;
+            }
+
+        if (toThrow != null)
+            throw toThrow;
     }
 }

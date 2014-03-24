@@ -86,6 +86,9 @@ public abstract class FtpAgent
         queue.pushBack(this);
     }
 
+    protected abstract void disconnect()
+        throws IOException;
+
     private final class FtpDirectoryIterator
         implements Iterator<Path>
     {
