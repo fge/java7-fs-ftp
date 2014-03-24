@@ -54,7 +54,7 @@ public final class CommonsNetFtpFileAttributes
     @Override
     public boolean isRegularFile()
     {
-        return false;
+        return ftpFile.isFile();
     }
 
     @Override
