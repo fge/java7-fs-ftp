@@ -21,10 +21,8 @@ package com.github.fge.ftpfs.io;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributeView;
-import java.util.Iterator;
 import java.util.List;
 
 public abstract class FtpAgent
@@ -41,32 +39,8 @@ public abstract class FtpAgent
     public abstract BasicFileAttributeView getAttributeView(final String name)
         throws IOException;
 
-    protected abstract List<String> getDirectoryNames(final String dir)
+    public abstract List<String> getDirectoryNames(final String dir)
         throws IOException;
-
-    public final DirectoryStream<Path> getDirectoryStream(final Path path)
-        throws IOException
-    {
-        final String dir = path.toRealPath().toString();
-        final List<String> names = getDirectoryNames(dir);
-
-        return new DirectoryStream<Path>()
-        {
-            @Override
-            public Iterator<Path> iterator()
-            {
-                return new FtpDirectoryIterator(path, names);
-            }
-
-            @Override
-            public void close()
-                throws IOException
-            {
-                // no-op
-            }
-        };
-
-    }
 
     protected abstract InputStream openInputStream(final String file)
         throws IOException;
@@ -74,8 +48,7 @@ public abstract class FtpAgent
     public final FtpInputStream getInputStream(final Path path)
         throws IOException
     {
-        final InputStream stream
-            = openInputStream(path.toAbsolutePath().toString());
+        final InputStream stream = openInputStream(path.toString());
         return new FtpInputStream(this, stream);
     }
 
@@ -88,35 +61,4 @@ public abstract class FtpAgent
 
     protected abstract void disconnect()
         throws IOException;
-
-    private final class FtpDirectoryIterator
-        implements Iterator<Path>
-    {
-        private final Path dir;
-        private final Iterator<String> iterator;
-
-        private FtpDirectoryIterator(final Path dir, final List<String> names)
-        {
-            this.dir = dir;
-            iterator = names.iterator();
-        }
-
-        @Override
-        public boolean hasNext()
-        {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public Path next()
-        {
-            return dir.resolve(iterator.next());
-        }
-
-        @Override
-        public void remove()
-        {
-            throw new UnsupportedOperationException();
-        }
-    }
 }
