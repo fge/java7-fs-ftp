@@ -127,4 +127,23 @@ public final class FtpFileSystem
     {
         return NopWatchService.INSTANCE;
     }
+
+    @Override
+    public int hashCode()
+    {
+        return uri.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj)
+    {
+        if (obj == null)
+            return false;
+        if (this == obj)
+            return true;
+        if (getClass() != obj.getClass())
+            return false;
+        final FtpFileSystem other = (FtpFileSystem) obj;
+        return uri.equals(other.uri);
+    }
 }
