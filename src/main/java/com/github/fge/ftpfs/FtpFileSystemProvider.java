@@ -18,11 +18,21 @@
 
 package com.github.fge.ftpfs;
 
+import com.github.fge.ftpfs.io.FtpAgent;
+import com.github.fge.ftpfs.io.FtpAgentFactory;
+import com.github.fge.ftpfs.io.FtpAgentQueue;
+import com.github.fge.ftpfs.io.FtpConfiguration;
+import com.github.fge.ftpfs.io.FtpFileView;
+import com.github.fge.ftpfs.path.SlashPath;
+import com.github.fge.ftpfs.util.AttributeUtil;
+import com.github.fge.ftpfs.util.BasicFileAttributesEnum;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.AccessMode;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryStream;
@@ -31,16 +41,36 @@ import java.nio.file.FileSystem;
 import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public final class FtpFileSystemProvider
     extends FileSystemProvider
 {
+    private static final int FTP_DEFAULT_PORT = 21;
+    private static final int MAX_AGENTS = 5;
+    private static final Pattern COMMA = Pattern.compile(",");
+
+    private final FtpAgentFactory agentFactory;
+    private final Map<URI, FileSystem> fileSystems = new HashMap<>();
+    private final Map<FileSystem, FtpAgentQueue> agentQueues = new HashMap<>();
+
+    public FtpFileSystemProvider(final FtpAgentFactory agentFactory)
+    {
+        this.agentFactory = agentFactory;
+    }
+
     @Override
     public String getScheme()
     {
@@ -51,7 +81,27 @@ public final class FtpFileSystemProvider
     public FileSystem newFileSystem(final URI uri, final Map<String, ?> env)
         throws IOException
     {
-        return null;
+        final String hostname = uri.getHost();
+        final int port = uri.getPort() == -1 ? FTP_DEFAULT_PORT : uri.getPort();
+
+        @SuppressWarnings("unchecked")
+        final Map<String, String> params = (Map<String, String>) env;
+
+        final String username = params.get("username");
+        final String password = params.get("password");
+        final SlashPath basePath = SlashPath.fromString(uri.getPath());
+
+        final FtpConfiguration cfg = new FtpConfiguration(hostname, port,
+            username, password, basePath);
+
+        final FileSystem fs = new FtpFileSystem(this, uri);
+        final FtpAgentQueue agentQueue
+            = new FtpAgentQueue(agentFactory, cfg, MAX_AGENTS);
+
+        fileSystems.put(uri, fs);
+        agentQueues.put(fs, agentQueue);
+
+        return fs;
     }
 
     @Override
@@ -59,8 +109,8 @@ public final class FtpFileSystemProvider
         final OpenOption... options)
         throws IOException
     {
-        // TODO
-        return super.newInputStream(path, options);
+        final FtpAgentQueue queue = agentQueues.get(path.getFileSystem());
+        return queue.getAgent().getInputStream(path);
     }
 
     @Override
@@ -74,13 +124,19 @@ public final class FtpFileSystemProvider
     @Override
     public FileSystem getFileSystem(final URI uri)
     {
-        return null;
+        return fileSystems.get(uri);
     }
 
     @Override
     public Path getPath(final URI uri)
     {
-        return null;
+        URI rel;
+        for (final Map.Entry<URI, FileSystem> entry: fileSystems.entrySet()) {
+            rel = entry.getKey().relativize(uri);
+            if (!rel.isAbsolute()) // found
+                return entry.getValue().getPath(rel.toString());
+        }
+        throw new IllegalStateException();
     }
 
     @Override
@@ -97,7 +153,50 @@ public final class FtpFileSystemProvider
         final DirectoryStream.Filter<? super Path> filter)
         throws IOException
     {
-        return null;
+        final FileSystem fs = dir.getFileSystem();
+        final FtpAgentQueue queue = agentQueues.get(fs);
+        try (
+            final FtpAgent agent = queue.getAgent();
+        ) {
+            final String absPath = dir.toRealPath().toString();
+            final Iterator<String> names
+                = agent.getDirectoryNames(absPath).iterator();
+            return new DirectoryStream<Path>()
+            {
+                @Override
+                public Iterator<Path> iterator()
+                {
+                    return new Iterator<Path>()
+                    {
+                        @Override
+                        public boolean hasNext()
+                        {
+                            return names.hasNext();
+                        }
+
+                        @Override
+                        public Path next()
+                        {
+                            if (!hasNext())
+                                throw new NoSuchElementException();
+                            return fs.getPath(names.next());
+                        }
+
+                        @Override
+                        public void remove()
+                        {
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+
+                @Override
+                public void close()
+                    throws IOException
+                {
+                }
+            };
+        }
     }
 
     @Override
@@ -134,35 +233,66 @@ public final class FtpFileSystemProvider
     public boolean isSameFile(final Path path, final Path path2)
         throws IOException
     {
-        return false;
+        return path.toRealPath().equals(path2.toRealPath());
     }
 
     @Override
     public boolean isHidden(final Path path)
         throws IOException
     {
-        return false;
+        if (path.getNameCount() == 0)
+            return false;
+        final String name = path.getFileName().toString();
+        return ".".equals(name) || "..".equals(name) ? false
+            : name.startsWith(".");
     }
 
     @Override
     public FileStore getFileStore(final Path path)
         throws IOException
     {
-        return null;
+        return path.getFileSystem().getFileStores().iterator().next();
     }
 
     @Override
     public void checkAccess(final Path path, final AccessMode... modes)
         throws IOException
     {
-
+        final FtpAgentQueue queue = agentQueues.get(path.getFileSystem());
+        final String name = path.toRealPath().toString();
+        final List<AccessMode> modeList = Arrays.asList(modes);
+        try (
+            final FtpAgent agent = queue.getAgent();
+        ) {
+            final FtpFileView view = agent.getFileView(name);
+            if (!view.getAccess().containsAll(modeList))
+                throw new AccessDeniedException(name);
+        }
     }
 
     @Override
     public <V extends FileAttributeView> V getFileAttributeView(final Path path,
         final Class<V> type, final LinkOption... options)
     {
-        return null;
+        if (type != BasicFileAttributeView.class)
+            return null;
+        final FtpAgentQueue queue = agentQueues.get(path.getFileSystem());
+        final String name;
+        try {
+            name = path.toRealPath(options).toString();
+        } catch (IOException ignored) {
+            return null;
+        }
+        try (
+            final FtpAgent agent = queue.getAgent();
+        ) {
+            final FtpFileView view = agent.getFileView(name);
+            return type.isAssignableFrom(view.getClass()) ? type.cast(view)
+                : null;
+        } catch (IOException e) {
+            // FIXME
+            return null;
+        }
     }
 
     @Override
@@ -170,7 +300,16 @@ public final class FtpFileSystemProvider
         final Class<A> type, final LinkOption... options)
         throws IOException
     {
-        return null;
+        final FtpAgentQueue queue = agentQueues.get(path.getFileSystem());
+        final String name = path.toRealPath().toString();
+        try (
+            final FtpAgent agent = queue.getAgent();
+        ) {
+            final BasicFileAttributes attributes
+                = agent.getFileView(name).readAttributes();
+            return type.isAssignableFrom(attributes.getClass())
+                ? type.cast(attributes) : null;
+        }
     }
 
     @Override
@@ -178,7 +317,23 @@ public final class FtpFileSystemProvider
         final String attributes, final LinkOption... options)
         throws IOException
     {
-        return null;
+        final Set<BasicFileAttributesEnum> set
+            = AttributeUtil.getAttributes(attributes);
+        final FtpAgentQueue queue = agentQueues.get(path.getFileSystem());
+        final String file = path.toRealPath().toString();
+        final BasicFileAttributes attrs;
+
+        try (
+            final FtpAgent agent = queue.getAgent();
+        ) {
+            attrs = agent.getFileView(file).readAttributes();
+        }
+
+        final Map<String, Object> ret = new HashMap<>();
+        for (final BasicFileAttributesEnum attr: set)
+            ret.put(attr.toString(), attr.getValue(attrs));
+
+        return ret;
     }
 
     @Override

@@ -18,20 +18,24 @@
 
 package com.github.fge.ftpfs.io;
 
+import com.github.fge.ftpfs.path.SlashPath;
+
 public final class FtpConfiguration
 {
     private final String hostname;
     private final int port;
     private final String username;
     private final String password;
+    private final SlashPath basePath;
 
     public FtpConfiguration(final String hostname, final int port,
-        final String username, final String password)
+        final String username, final String password, final SlashPath basePath)
     {
         this.hostname = hostname;
         this.port = port;
         this.username = username;
         this.password = password;
+        this.basePath = basePath;
     }
 
     public String getHostname()
@@ -52,5 +56,10 @@ public final class FtpConfiguration
     public String getPassword()
     {
         return password;
+    }
+
+    public SlashPath getBasePath()
+    {
+        return basePath;
     }
 }

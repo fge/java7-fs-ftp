@@ -41,9 +41,14 @@ public final class FtpAgentQueue
     }
 
     public FtpAgent getAgent()
-        throws InterruptedException
+        throws IOException
     {
-        return agents.take();
+        try {
+            return agents.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Interrupted!", e);
+        }
     }
 
     public void pushBack(final FtpAgent agent)

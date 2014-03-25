@@ -18,9 +18,12 @@
 
 package com.github.fge.ftpfs.io;
 
+import java.nio.file.AccessMode;
 import java.nio.file.attribute.BasicFileAttributeView;
+import java.util.Collection;
 
-public interface FtpFileAttributeView
+public interface FtpFileView
     extends BasicFileAttributeView
 {
+    Collection<AccessMode> getAccess();
 }

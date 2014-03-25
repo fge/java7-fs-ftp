@@ -21,8 +21,9 @@ package com.github.fge.ftpfs.io;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.AccessMode;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributeView;
+import java.util.EnumSet;
 import java.util.List;
 
 public abstract class FtpAgent
@@ -38,8 +39,10 @@ public abstract class FtpAgent
         this.cfg = cfg;
     }
 
-    public abstract BasicFileAttributeView getAttributeView(final String name)
+    public abstract FtpFileView getFileView(final String name)
         throws IOException;
+
+    public abstract EnumSet<AccessMode> getAccess(final String name);
 
     public abstract List<String> getDirectoryNames(final String dir)
         throws IOException;
