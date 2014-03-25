@@ -30,10 +30,11 @@ public abstract class FtpAgent
     implements Closeable
 {
     private final FtpAgentQueue queue;
-    private final FtpConfiguration cfg;
+    protected final FtpConfiguration cfg;
+
+    protected Status status = Status.INITIALIZED;
 
     protected FtpAgent(final FtpAgentQueue queue, final FtpConfiguration cfg)
-        throws IOException
     {
         this.queue = queue;
         this.cfg = cfg;
@@ -42,7 +43,8 @@ public abstract class FtpAgent
     public abstract FtpFileView getFileView(final String name)
         throws IOException;
 
-    public abstract EnumSet<AccessMode> getAccess(final String name);
+    public abstract EnumSet<AccessMode> getAccess(final String name)
+        throws IOException;
 
     public abstract List<String> getDirectoryNames(final String dir)
         throws IOException;
@@ -57,6 +59,14 @@ public abstract class FtpAgent
         return new FtpInputStream(this, stream);
     }
 
+    public final boolean isDead()
+    {
+        return status == Status.DEAD;
+    }
+
+    public abstract void completeTransfer()
+        throws IOException;
+
     @Override
     public final void close()
         throws IOException
@@ -64,6 +74,20 @@ public abstract class FtpAgent
         queue.pushBack(this);
     }
 
+    public final Status getStatus()
+    {
+        return status;
+    }
+
+    public abstract void connect()
+        throws IOException;
+
     protected abstract void disconnect()
         throws IOException;
+
+    public enum Status {
+        INITIALIZED,
+        CONNECTED,
+        DEAD
+    }
 }

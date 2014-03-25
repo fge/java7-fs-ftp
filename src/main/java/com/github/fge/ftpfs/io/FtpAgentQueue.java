@@ -24,27 +24,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class FtpAgentQueue
     implements Closeable
 {
-    private final BlockingQueue<FtpAgent> agents;
+    private final BlockingQueue<FtpAgent> queue;
     private final FtpConfiguration cfg;
+    private final AtomicBoolean initialized = new AtomicBoolean(false);
+    private final FtpAgentFactory factory;
+    private final int maxAgents;
 
-    public FtpAgentQueue(final FtpAgentFactory provider,
+    public FtpAgentQueue(final FtpAgentFactory factory,
         final FtpConfiguration cfg, final int maxAgents)
     {
-        agents = new ArrayBlockingQueue<>(maxAgents);
+        queue = new ArrayBlockingQueue<>(maxAgents);
         this.cfg = cfg;
-        for (int i = 0; i < maxAgents; i++)
-            agents.add(provider.get(this, cfg));
+        this.maxAgents = maxAgents;
+        this.factory = factory;
     }
 
     public FtpAgent getAgent()
         throws IOException
     {
+        if (!initialized.getAndSet(true))
+            fillQueue();
         try {
-            return agents.take();
+            FtpAgent agent = queue.take();
+            if (agent.isDead())
+                agent = factory.get(this, cfg);
+            agent.connect();
+            return agent;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IOException("Interrupted!", e);
@@ -53,7 +63,7 @@ public final class FtpAgentQueue
 
     public void pushBack(final FtpAgent agent)
     {
-        agents.add(agent);
+        queue.add(agent);
     }
 
     @Override
@@ -63,7 +73,7 @@ public final class FtpAgentQueue
         IOException toThrow = null;
 
         final List<FtpAgent> list = new ArrayList<>();
-        agents.drainTo(list);
+        queue.drainTo(list);
         for (final FtpAgent agent: list)
             try {
                 agent.disconnect();
@@ -74,5 +84,11 @@ public final class FtpAgentQueue
 
         if (toThrow != null)
             throw toThrow;
+    }
+
+    private void fillQueue()
+    {
+        for (int i = 0; i < maxAgents; i++)
+            queue.add(factory.get(this, cfg));
     }
 }

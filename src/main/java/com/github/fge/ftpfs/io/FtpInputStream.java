@@ -92,6 +92,7 @@ public final class FtpInputStream
         throws IOException
     {
         stream.close();
+        agent.completeTransfer();
         agent.close();
     }
 }
