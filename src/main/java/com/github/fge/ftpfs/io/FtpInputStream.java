@@ -18,19 +18,31 @@
 
 package com.github.fge.ftpfs.io;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
+/**
+ * A wrapped FTP data connection
+ */
 public final class FtpInputStream
     extends InputStream
 {
     private final FtpAgent agent;
     private final InputStream stream;
 
-    public FtpInputStream(final FtpAgent agent, final InputStream stream)
+    /**
+     * Constructor
+     *
+     * @param agent the agent to use
+     * @param stream the FTP data connection as a stream
+     */
+    public FtpInputStream(@Nonnull final FtpAgent agent,
+        @Nonnull final InputStream stream)
     {
-        this.agent = agent;
-        this.stream = stream;
+        this.agent = Objects.requireNonNull(agent, "agent is null");
+        this.stream = Objects.requireNonNull(stream, "input stream is null");
     }
 
     @Override
@@ -87,12 +99,28 @@ public final class FtpInputStream
         return stream.markSupported();
     }
 
+    /**
+     * Close the input stream
+     *
+     * <p>This first closes the underlying data stream, then checks the
+     * FTP transfer status before finally closing the agent.</p>
+     *
+     * @throws IOException failure to close the stream, or FTP command did not
+     * complete properly
+     * @see FtpAgent#completeTransfer()
+     */
     @Override
     public void close()
         throws IOException
     {
-        stream.close();
-        agent.completeTransfer();
+        try {
+            stream.close();
+        } catch (IOException ignored) {
+        }
+        try {
+            agent.completeTransfer();
+        } catch (IOException ignored) {
+        }
         agent.close();
     }
 }
