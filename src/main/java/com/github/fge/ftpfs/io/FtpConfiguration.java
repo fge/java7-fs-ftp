@@ -19,7 +19,13 @@
 package com.github.fge.ftpfs.io;
 
 import com.github.fge.ftpfs.path.SlashPath;
+import org.apache.commons.net.ftp.FTP;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.Immutable;
+import java.util.Objects;
+
+@Immutable
 public final class FtpConfiguration
 {
     private final String hostname;
@@ -28,14 +34,18 @@ public final class FtpConfiguration
     private final String password;
     private final SlashPath basePath;
 
-    public FtpConfiguration(final String hostname, final int port,
-        final String username, final String password, final SlashPath basePath)
+    public static Builder newBuilder()
     {
-        this.hostname = hostname;
-        this.port = port;
-        this.username = username;
-        this.password = password;
-        this.basePath = basePath;
+        return new Builder();
+    }
+
+    private FtpConfiguration(final Builder builder)
+    {
+        hostname = builder.hostname;
+        port = builder.port;
+        username = builder.username;
+        password = builder.password;
+        basePath = builder.basePath;
     }
 
     public String getHostname()
@@ -61,5 +71,64 @@ public final class FtpConfiguration
     public SlashPath getBasePath()
     {
         return basePath;
+    }
+
+    public static final class Builder
+    {
+        private static final int MIN_PORT = 0;
+        private static final int MAX_PORT = 65535;
+
+        private String hostname;
+        private int port = FTP.DEFAULT_PORT;
+        private String username = "anonymous";
+        // lftp sends lftp@ as a password and it works pretty well, so...
+        private String password = "java7fsftp@";
+        private SlashPath basePath = SlashPath.ROOT;
+
+        private Builder()
+        {
+        }
+
+        public Builder setHostname(@Nonnull final String hostname)
+        {
+            this.hostname = Objects.requireNonNull(hostname,
+                "hostname cannot be null");
+            return this;
+        }
+
+        public Builder setPort(final int port)
+        {
+            if (port < MIN_PORT || port > MAX_PORT)
+                throw new IllegalArgumentException("illegal port number "
+                    + port);
+            this.port = port;
+            return this;
+        }
+
+        public Builder setUsername(final String username)
+        {
+            this.username = Objects.requireNonNull(username,
+                "username cannot be null");
+            return this;
+        }
+
+        public Builder setPassword(final String password)
+        {
+            this.password = Objects.requireNonNull(password,
+                "password cannot be null");
+            return this;
+        }
+
+        public Builder setBasePath(final String path)
+        {
+            basePath = SlashPath.fromString(path);
+            return this;
+        }
+
+        public FtpConfiguration build()
+        {
+            Objects.requireNonNull(hostname, "no hostname has been provided");
+            return new FtpConfiguration(this);
+        }
     }
 }

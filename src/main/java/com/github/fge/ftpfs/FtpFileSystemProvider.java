@@ -23,7 +23,6 @@ import com.github.fge.ftpfs.io.FtpAgentFactory;
 import com.github.fge.ftpfs.io.FtpAgentQueue;
 import com.github.fge.ftpfs.io.FtpConfiguration;
 import com.github.fge.ftpfs.io.FtpFileView;
-import com.github.fge.ftpfs.path.SlashPath;
 import com.github.fge.ftpfs.util.AttributeUtil;
 import com.github.fge.ftpfs.util.BasicFileAttributesEnum;
 
@@ -89,10 +88,10 @@ public final class FtpFileSystemProvider
 
         final String username = params.get("username");
         final String password = params.get("password");
-        final SlashPath basePath = SlashPath.fromString(uri.getPath());
 
-        final FtpConfiguration cfg = new FtpConfiguration(hostname, port,
-            username, password, basePath);
+        final FtpConfiguration cfg = FtpConfiguration.newBuilder()
+            .setHostname(hostname).setPort(port).setUsername(username)
+            .setPassword(password).setBasePath(uri.getPath()).build();
 
         final FileSystem fs = new FtpFileSystem(this, uri);
         final FtpAgentQueue agentQueue

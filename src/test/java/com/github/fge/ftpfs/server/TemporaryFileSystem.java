@@ -56,7 +56,7 @@ public final class TemporaryFileSystem
         Files.createDirectories(dst, attrs);
     }
 
-    public void createFile(final String name, final String perms)
+    public Path createFile(final String name, final String perms)
         throws IOException
     {
         final FileAttribute<?> attrs = fromString(perms);
@@ -65,6 +65,7 @@ public final class TemporaryFileSystem
             throw new IllegalArgumentException();
         final Path dst = baseDir.resolve(path);
         Files.createFile(dst, attrs);
+        return dst;
     }
 
     public void delete()
