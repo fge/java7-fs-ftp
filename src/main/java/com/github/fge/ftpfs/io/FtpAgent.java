@@ -74,11 +74,6 @@ public abstract class FtpAgent
         queue.pushBack(this);
     }
 
-    public final Status getStatus()
-    {
-        return status;
-    }
-
     public abstract void connect()
         throws IOException;
 
