@@ -20,69 +20,34 @@ package com.github.fge.ftpfs.io;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.AccessMode;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
 
-public abstract class FtpAgent
-    implements Closeable
+public interface FtpAgent
+    extends Closeable
 {
-    private final FtpAgentQueue queue;
-    protected final FtpConfiguration cfg;
-
-    protected Status status = Status.INITIALIZED;
-
-    protected FtpAgent(final FtpAgentQueue queue, final FtpConfiguration cfg)
-    {
-        this.queue = queue;
-        this.cfg = cfg;
-    }
-
-    public abstract FtpFileView getFileView(final String name)
+    FtpFileView getFileView(final String name)
         throws IOException;
 
-    public abstract EnumSet<AccessMode> getAccess(final String name)
+    EnumSet<AccessMode> getAccess(final String name)
         throws IOException;
 
-    public abstract List<String> getDirectoryNames(final String dir)
+    List<String> getDirectoryNames(final String dir)
         throws IOException;
 
-    protected abstract InputStream openInputStream(final String file)
+    FtpInputStream getInputStream(final Path path)
         throws IOException;
 
-    public final FtpInputStream getInputStream(final Path path)
-        throws IOException
-    {
-        final InputStream stream = openInputStream(path.toString());
-        return new FtpInputStream(this, stream);
-    }
+    boolean isDead();
 
-    public final boolean isDead()
-    {
-        return status == Status.DEAD;
-    }
-
-    public abstract void completeTransfer()
+    void completeTransfer()
         throws IOException;
 
-    @Override
-    public final void close()
-        throws IOException
-    {
-        queue.pushBack(this);
-    }
-
-    public abstract void connect()
+    void connect()
         throws IOException;
 
-    protected abstract void disconnect()
+    void disconnect()
         throws IOException;
-
-    public enum Status {
-        INITIALIZED,
-        CONNECTED,
-        DEAD
-    }
 }

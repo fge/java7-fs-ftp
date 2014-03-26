@@ -18,7 +18,7 @@
 
 package com.github.fge.ftpfs.io.commonsnetimpl;
 
-import com.github.fge.ftpfs.io.FtpAgent;
+import com.github.fge.ftpfs.io.AbstractFtpAgent;
 import com.github.fge.ftpfs.io.FtpAgentQueue;
 import com.github.fge.ftpfs.io.FtpConfiguration;
 import com.github.fge.ftpfs.io.FtpFileView;
@@ -41,7 +41,7 @@ import java.util.List;
 
 @NotThreadSafe
 public final class CommonsNetFtpAgent
-    extends FtpAgent
+    extends AbstractFtpAgent
 {
     private final FTPClient ftpClient;
 
@@ -171,7 +171,7 @@ public final class CommonsNetFtpAgent
     }
 
     @Override
-    protected void disconnect()
+    public void disconnect()
         throws IOException
     {
         ftpClient.disconnect();
