@@ -192,7 +192,7 @@ public final class CommonsNetFtpAgent
             ret.add(AccessMode.READ);
         if (file.hasPermission(FTPFile.USER_ACCESS, FTPFile.WRITE_PERMISSION))
             ret.add(AccessMode.WRITE);
-        if (file.hasPermission(FTPFile.USER_ACCESS, FTPFile.READ_PERMISSION))
+        if (file.hasPermission(FTPFile.USER_ACCESS, FTPFile.EXECUTE_PERMISSION))
             ret.add(AccessMode.EXECUTE);
         return ret;
     }
