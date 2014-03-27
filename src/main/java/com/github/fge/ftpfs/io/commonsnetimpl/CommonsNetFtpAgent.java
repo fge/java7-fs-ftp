@@ -51,7 +51,6 @@ public final class CommonsNetFtpAgent
         super(queue, cfg);
         ftpClient = new FTPClient();
         ftpClient.setAutodetectUTF8(true);
-        ftpClient.setListHiddenFiles(true);
     }
 
     @Override
