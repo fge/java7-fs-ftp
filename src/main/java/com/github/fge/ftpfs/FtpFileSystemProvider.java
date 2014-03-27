@@ -178,7 +178,8 @@ public final class FtpFileSystemProvider
         final DirectoryStream.Filter<? super Path> filter)
         throws IOException
     {
-        final FileSystem fs = dir.getFileSystem();
+        // FIXME...
+        final FtpFileSystem fs = (FtpFileSystem) dir.getFileSystem();
         final FtpAgentQueue queue = agentQueues.get(fs);
         try (
             final FtpAgent agent = queue.getAgent();
