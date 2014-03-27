@@ -24,7 +24,9 @@ import com.github.fge.ftpfs.io.FtpAgentQueue;
 import com.github.fge.ftpfs.io.FtpFileView;
 import com.github.fge.ftpfs.util.AttributeUtil;
 import com.github.fge.ftpfs.util.BasicFileAttributesEnum;
+import com.github.fge.ftpfs.util.FtpFs;
 
+import javax.annotation.concurrent.GuardedBy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,6 +38,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -55,11 +58,13 @@ import java.util.Set;
 public final class FtpFileSystemProvider
     extends FileSystemProvider
 {
-    private static final int FTP_DEFAULT_PORT = 21;
     private static final int MAX_AGENTS = 5;
 
     private final FtpAgentFactory agentFactory;
+
+    @GuardedBy("fileSystems")
     private final Map<URI, FileSystem> fileSystems = new HashMap<>();
+    @GuardedBy("fileSystems")
     private final Map<FileSystem, FtpAgentQueue> agentQueues = new HashMap<>();
 
     public FtpFileSystemProvider(final FtpAgentFactory agentFactory)
@@ -77,8 +82,13 @@ public final class FtpFileSystemProvider
     public FileSystem newFileSystem(final URI uri, final Map<String, ?> env)
         throws IOException
     {
-        final String hostname = uri.getHost();
-        final int port = uri.getPort() == -1 ? FTP_DEFAULT_PORT : uri.getPort();
+        final URI normalized = FtpFs.normalizeAndCheck(uri);
+
+        final FtpConfiguration.Builder builder = FtpConfiguration.newBuilder()
+            .setHostname(normalized.getHost());
+
+        if (normalized.getPort() != -1)
+            builder.setPort(normalized.getPort());
 
         @SuppressWarnings("unchecked")
         final Map<String, String> params = (Map<String, String>) env;
@@ -86,18 +96,26 @@ public final class FtpFileSystemProvider
         final String username = params.get("username");
         final String password = params.get("password");
 
-        final FtpConfiguration cfg = FtpConfiguration.newBuilder()
-            .setHostname(hostname).setPort(port).setUsername(username)
-            .setPassword(password).build();
+        if (username != null)
+            builder.setUsername(username);
+        if (password != null)
+            builder.setPassword(password);
 
-        final FileSystem fs = new FtpFileSystem(this, uri);
-        final FtpAgentQueue agentQueue
-            = new FtpAgentQueue(agentFactory, cfg, MAX_AGENTS);
+        final FtpConfiguration cfg = builder.build();
 
-        fileSystems.put(uri, fs);
-        agentQueues.put(fs, agentQueue);
+        synchronized (fileSystems) {
+            if (fileSystems.containsKey(normalized))
+                throw new FileSystemAlreadyExistsException();
 
-        return fs;
+            final FileSystem fs = new FtpFileSystem(this, normalized);
+            final FtpAgentQueue agentQueue
+                = new FtpAgentQueue(agentFactory, cfg, MAX_AGENTS);
+
+            fileSystems.put(normalized, fs);
+            agentQueues.put(fs, agentQueue);
+
+            return fs;
+        }
     }
 
     @Override
