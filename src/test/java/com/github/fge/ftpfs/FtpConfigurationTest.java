@@ -18,7 +18,6 @@
 
 package com.github.fge.ftpfs;
 
-import com.github.fge.ftpfs.FtpConfiguration;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -93,28 +92,6 @@ public final class FtpConfigurationTest
             fail("No exception thrown!!");
         } catch (NullPointerException e) {
             assertEquals(e.getMessage(), "password cannot be null");
-        }
-    }
-
-    @Test
-    public void cannotProvideNullBasePath()
-    {
-        try {
-            builder.setBasePath(null);
-            fail("No exception thrown!!");
-        } catch (NullPointerException e) {
-            assertEquals(e.getMessage(), "base path cannot be null");
-        }
-    }
-
-    @Test
-    public void cannotProvideNonAbsoluteBasePath()
-    {
-        try {
-            builder.setBasePath("a/b");
-            fail("No exception thrown!!");
-        } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "base path must be absolute");
         }
     }
 }

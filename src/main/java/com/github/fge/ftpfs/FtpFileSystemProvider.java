@@ -88,7 +88,7 @@ public final class FtpFileSystemProvider
 
         final FtpConfiguration cfg = FtpConfiguration.newBuilder()
             .setHostname(hostname).setPort(port).setUsername(username)
-            .setPassword(password).setBasePath(uri.getPath()).build();
+            .setPassword(password).build();
 
         final FileSystem fs = new FtpFileSystem(this, uri);
         final FtpAgentQueue agentQueue

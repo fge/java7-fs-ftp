@@ -18,7 +18,6 @@
 
 package com.github.fge.ftpfs;
 
-import com.github.fge.ftpfs.path.SlashPath;
 import org.apache.commons.net.ftp.FTP;
 
 import javax.annotation.Nonnull;
@@ -32,7 +31,6 @@ public final class FtpConfiguration
     private final int port;
     private final String username;
     private final String password;
-    private final SlashPath basePath;
 
     public static Builder newBuilder()
     {
@@ -45,7 +43,6 @@ public final class FtpConfiguration
         port = builder.port;
         username = builder.username;
         password = builder.password;
-        basePath = builder.basePath;
     }
 
     public String getHostname()
@@ -68,11 +65,6 @@ public final class FtpConfiguration
         return password;
     }
 
-    public SlashPath getBasePath()
-    {
-        return basePath;
-    }
-
     public static final class Builder
     {
         private static final int MIN_PORT = 0;
@@ -83,7 +75,6 @@ public final class FtpConfiguration
         private String username = "anonymous";
         // lftp sends lftp@ as a password and it works pretty well, so...
         private String password = "java7fsftp@";
-        private SlashPath basePath = SlashPath.ROOT;
 
         private Builder()
         {
@@ -116,16 +107,6 @@ public final class FtpConfiguration
         {
             this.password = Objects.requireNonNull(password,
                 "password cannot be null");
-            return this;
-        }
-
-        public Builder setBasePath(final String path)
-        {
-            Objects.requireNonNull(path, "base path cannot be null");
-            basePath = SlashPath.fromString(path);
-            if (!basePath.isAbsolute())
-                throw new IllegalArgumentException("base path must be " +
-                    "absolute");
             return this;
         }
 

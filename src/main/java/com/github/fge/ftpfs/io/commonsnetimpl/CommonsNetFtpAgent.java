@@ -157,9 +157,6 @@ public final class CommonsNetFtpAgent
             if (!ftpClient.login(cfg.getUsername(), cfg.getPassword()))
                 throw new IOException("cannot login to server (server reply: "
                     + ftpClient.getReplyCode());
-            if (!ftpClient.changeWorkingDirectory(cfg.getBasePath().toString()))
-                throw new IOException("cannot change directory (server reply: "
-                    + ftpClient.getReplyCode());
         } catch (FTPConnectionClosedException e) {
             status = Status.DEAD;
             throw new IOException("service unavailable", e);
