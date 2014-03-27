@@ -33,6 +33,7 @@ import java.nio.file.attribute.UserPrincipalLookupService;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class FtpFileSystem
     extends FileSystem
@@ -41,7 +42,7 @@ public final class FtpFileSystem
     private final URI uri;
     private final FileStore fileStore;
 
-    private boolean open = true;
+    private final AtomicBoolean open = new AtomicBoolean(true);
 
     public FtpFileSystem(final FtpFileSystemProvider provider, final URI uri)
     {
@@ -60,13 +61,14 @@ public final class FtpFileSystem
     public void close()
         throws IOException
     {
-        open = false;
+        if (open.getAndSet(false))
+            provider.unregister(this);
     }
 
     @Override
     public boolean isOpen()
     {
-        return open;
+        return open.get();
     }
 
     @Override
@@ -145,5 +147,10 @@ public final class FtpFileSystem
             return false;
         final FtpFileSystem other = (FtpFileSystem) obj;
         return uri.equals(other.uri);
+    }
+
+    URI getUri()
+    {
+        return uri;
     }
 }

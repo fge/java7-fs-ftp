@@ -39,6 +39,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.LinkOption;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -63,9 +64,10 @@ public final class FtpFileSystemProvider
     private final FtpAgentFactory agentFactory;
 
     @GuardedBy("fileSystems")
-    private final Map<URI, FileSystem> fileSystems = new HashMap<>();
+    private final Map<URI, FtpFileSystem> fileSystems = new HashMap<>();
     @GuardedBy("fileSystems")
-    private final Map<FileSystem, FtpAgentQueue> agentQueues = new HashMap<>();
+    private final Map<FtpFileSystem, FtpAgentQueue> agentQueues
+        = new HashMap<>();
 
     public FtpFileSystemProvider(final FtpAgentFactory agentFactory)
     {
@@ -107,7 +109,7 @@ public final class FtpFileSystemProvider
             if (fileSystems.containsKey(normalized))
                 throw new FileSystemAlreadyExistsException();
 
-            final FileSystem fs = new FtpFileSystem(this, normalized);
+            final FtpFileSystem fs = new FtpFileSystem(this, normalized);
             final FtpAgentQueue agentQueue
                 = new FtpAgentQueue(agentFactory, cfg, MAX_AGENTS);
 
@@ -138,19 +140,28 @@ public final class FtpFileSystemProvider
     @Override
     public FileSystem getFileSystem(final URI uri)
     {
-        return fileSystems.get(uri);
+        synchronized (fileSystems) {
+            final FileSystem ret = fileSystems.get(uri);
+            if (ret == null)
+                throw new FileSystemNotFoundException();
+            return ret;
+        }
     }
 
     @Override
     public Path getPath(final URI uri)
     {
         URI rel;
-        for (final Map.Entry<URI, FileSystem> entry: fileSystems.entrySet()) {
-            rel = entry.getKey().relativize(uri);
-            if (!rel.isAbsolute()) // found
-                return entry.getValue().getPath(rel.toString());
+        synchronized (fileSystems) {
+            final Set<Map.Entry<URI, FtpFileSystem>> set
+                = fileSystems.entrySet();
+            for (final Map.Entry<URI, FtpFileSystem> entry: set) {
+                rel = entry.getKey().relativize(uri);
+                if (!rel.isAbsolute()) // found
+                    return entry.getValue().getPath(rel.toString());
+            }
+            throw new IllegalStateException();
         }
-        throw new IllegalStateException();
     }
 
     @Override
@@ -257,8 +268,7 @@ public final class FtpFileSystemProvider
         if (path.getNameCount() == 0)
             return false;
         final String name = path.getFileName().toString();
-        return ".".equals(name) || "..".equals(name) ? false
-            : name.startsWith(".");
+        return !(".".equals(name) || "..".equals(name)) && name.startsWith(".");
     }
 
     @Override
@@ -356,5 +366,18 @@ public final class FtpFileSystemProvider
         throws IOException
     {
         throw new IllegalStateException();
+    }
+
+    void unregister(final FtpFileSystem fs) {
+        synchronized (fileSystems) {
+            final URI uri = fs.getUri();
+            final FtpAgentQueue queue = agentQueues.get(fs);
+            fileSystems.remove(uri);
+            try {
+                queue.close();
+            } catch (IOException ignored) {
+            }
+            agentQueues.remove(fs);
+        }
     }
 }
