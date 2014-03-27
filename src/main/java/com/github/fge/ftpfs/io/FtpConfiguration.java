@@ -121,7 +121,11 @@ public final class FtpConfiguration
 
         public Builder setBasePath(final String path)
         {
+            Objects.requireNonNull(path, "base path cannot be null");
             basePath = SlashPath.fromString(path);
+            if (!basePath.isAbsolute())
+                throw new IllegalArgumentException("base path must be " +
+                    "absolute");
             return this;
         }
 
