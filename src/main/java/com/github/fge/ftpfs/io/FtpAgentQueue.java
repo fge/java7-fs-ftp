@@ -18,6 +18,8 @@
 
 package com.github.fge.ftpfs.io;
 
+import com.github.fge.ftpfs.FtpConfiguration;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;

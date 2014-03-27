@@ -18,6 +18,7 @@
 
 package com.github.fge.ftpfs.io;
 
+import com.github.fge.ftpfs.FtpConfiguration;
 import org.mockito.InOrder;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

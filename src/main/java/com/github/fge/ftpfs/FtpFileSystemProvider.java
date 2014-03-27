@@ -21,7 +21,6 @@ package com.github.fge.ftpfs;
 import com.github.fge.ftpfs.io.FtpAgent;
 import com.github.fge.ftpfs.io.FtpAgentFactory;
 import com.github.fge.ftpfs.io.FtpAgentQueue;
-import com.github.fge.ftpfs.io.FtpConfiguration;
 import com.github.fge.ftpfs.io.FtpFileView;
 import com.github.fge.ftpfs.util.AttributeUtil;
 import com.github.fge.ftpfs.util.BasicFileAttributesEnum;
@@ -52,14 +51,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 public final class FtpFileSystemProvider
     extends FileSystemProvider
 {
     private static final int FTP_DEFAULT_PORT = 21;
     private static final int MAX_AGENTS = 5;
-    private static final Pattern COMMA = Pattern.compile(",");
 
     private final FtpAgentFactory agentFactory;
     private final Map<URI, FileSystem> fileSystems = new HashMap<>();

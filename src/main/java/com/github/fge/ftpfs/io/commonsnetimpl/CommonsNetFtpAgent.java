@@ -20,7 +20,7 @@ package com.github.fge.ftpfs.io.commonsnetimpl;
 
 import com.github.fge.ftpfs.io.AbstractFtpAgent;
 import com.github.fge.ftpfs.io.FtpAgentQueue;
-import com.github.fge.ftpfs.io.FtpConfiguration;
+import com.github.fge.ftpfs.FtpConfiguration;
 import com.github.fge.ftpfs.io.FtpFileView;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;

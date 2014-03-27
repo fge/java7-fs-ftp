@@ -16,8 +16,9 @@
  * - ASL 2.0: http://www.apache.org/licenses/LICENSE-2.0.txt
  */
 
-package com.github.fge.ftpfs.io;
+package com.github.fge.ftpfs;
 
+import com.github.fge.ftpfs.FtpConfiguration;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

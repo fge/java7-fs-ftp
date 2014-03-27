@@ -21,7 +21,7 @@ package com.github.fge.ftpfs.io.commonsnetimpl;
 import com.github.fge.ftpfs.io.FtpAgent;
 import com.github.fge.ftpfs.io.FtpAgentFactory;
 import com.github.fge.ftpfs.io.FtpAgentQueue;
-import com.github.fge.ftpfs.io.FtpConfiguration;
+import com.github.fge.ftpfs.FtpConfiguration;
 
 public final class CommonsNetFtpAgentFactory
     implements FtpAgentFactory

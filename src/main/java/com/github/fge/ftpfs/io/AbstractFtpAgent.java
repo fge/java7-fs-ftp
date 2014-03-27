@@ -18,6 +18,8 @@
 
 package com.github.fge.ftpfs.io;
 
+import com.github.fge.ftpfs.FtpConfiguration;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;

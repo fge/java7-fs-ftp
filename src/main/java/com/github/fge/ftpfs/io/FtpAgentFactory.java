@@ -18,6 +18,8 @@
 
 package com.github.fge.ftpfs.io;
 
+import com.github.fge.ftpfs.FtpConfiguration;
+
 public interface FtpAgentFactory
 {
     FtpAgent get(final FtpAgentQueue queue, final FtpConfiguration cfg);
