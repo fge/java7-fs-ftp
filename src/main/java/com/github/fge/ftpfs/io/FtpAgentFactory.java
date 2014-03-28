@@ -20,7 +20,17 @@ package com.github.fge.ftpfs.io;
 
 import com.github.fge.ftpfs.FtpConfiguration;
 
+/**
+ * Factory for {@link FtpAgent} instances
+ */
 public interface FtpAgentFactory
 {
+    /**
+     * Create one agent
+     *
+     * @param queue the agent queue
+     * @param cfg the FTP agent configuration
+     * @return a new agent
+     */
     FtpAgent get(final FtpAgentQueue queue, final FtpConfiguration cfg);
 }
