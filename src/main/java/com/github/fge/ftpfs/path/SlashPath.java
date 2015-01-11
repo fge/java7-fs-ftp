@@ -300,13 +300,12 @@ public final class SlashPath
 
     public SlashPath subpath(final int start, final int end)
     {
-        if (start < 0 || start >= components.size())
-            throw new IllegalArgumentException("illegal start index");
-        if (end <= start)
-            throw new IllegalArgumentException("end index must be greater " +
-                "than start index");
+        if (start < 0)
+            throw new IllegalArgumentException("start index (" + start + ") must not be negative");
+        if (end < start)
+            throw new IllegalArgumentException("end index (" + end + ") must not be less than start index (" + start + ")");
         if (end > components.size())
-            throw new IllegalArgumentException("illegal end index");
+            throw new IllegalArgumentException("end index (" + end + ") must not be greater than size (" + components.size() + ")");
         return new SlashPath(components.subList(start, end), false);
     }
 

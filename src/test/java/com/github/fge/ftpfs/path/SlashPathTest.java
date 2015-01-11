@@ -211,13 +211,10 @@ public final class SlashPathTest
     {
         final List<Object[]> list = new ArrayList<>();
 
-        list.add(new Object[] { -1, 2, "illegal start index" });
-        list.add(new Object[] { 3, 2, "illegal start index" });
-        list.add(new Object[] { 0, -1, "end index must be greater than " +
-            "start index" });
-        list.add(new Object[] { 0, 4, "illegal end index" });
-        list.add(new Object[] { 2, 2, "end index must be greater than " +
-            "start index" });
+        list.add(new Object[] { -1, 2, "start index (-1) must not be negative" });
+        list.add(new Object[] { 3, 2, "end index (2) must not be less than start index (3)" });
+        list.add(new Object[] { 0, -1, "end index (-1) must not be less than start index (0)" });
+        list.add(new Object[] { 0, 4, "end index (4) must not be greater than size (3)" });
         return list.iterator();
     }
 
@@ -243,6 +240,7 @@ public final class SlashPathTest
         list.add(new Object[] { "/a/b/c/d/e/f", 2, 6, "c/d/e/f" });
         list.add(new Object[] { "/a/b/c/d/e/f", 0, 6, "a/b/c/d/e/f" });
         list.add(new Object[] { "/a/b/c/d/e/f", 1, 4, "b/c/d" });
+        list.add(new Object[] { "/a/b/c/d/e/f", 2, 2, "" });
         return list.iterator();
     }
 
