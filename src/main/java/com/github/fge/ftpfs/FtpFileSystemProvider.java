@@ -160,8 +160,10 @@ public final class FtpFileSystemProvider
                 if (!rel.isAbsolute()) // found
                     return entry.getValue().getPath(rel.toString());
             }
-            throw new IllegalStateException();
         }
+
+        throw new FileSystemNotFoundException("The file system for " + uri
+                + " does not exist and cannot be created automatically");
     }
 
     @Override
