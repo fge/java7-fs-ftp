@@ -82,7 +82,6 @@ public final class FtpFileSystemProvider
 
     @Override
     public FileSystem newFileSystem(final URI uri, final Map<String, ?> env)
-        throws IOException
     {
         final URI normalized = FtpFs.normalizeAndCheckRoot(uri);
 
