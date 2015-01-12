@@ -30,74 +30,63 @@ import static org.testng.Assert.*;
 
 public final class FtpFsTest
 {
-    @Test
-    public void cannotSubmitNullURI()
+    @Test(expectedExceptions = NullPointerException.class,
+            expectedExceptionsMessageRegExp = "uri cannot be null")
+    public void cannotSubmitNullRootURI()
     {
-        try {
-            FtpFs.normalizeAndCheck(null);
-            fail("No exception thrown!!");
-        } catch (NullPointerException e) {
-            assertEquals(e.getMessage(), "uri cannot be null");
-        }
+        FtpFs.normalizeAndCheckRoot(null);
     }
 
-    @Test
-    public void cannotSubmitNonAbsoluteURI()
+    @Test(expectedExceptions = NullPointerException.class,
+            expectedExceptionsMessageRegExp = "uri cannot be null")
+    public void cannotSubmitNullNonRootURI()
+    {
+        FtpFs.normalizeAndCheckNonRoot(null);
+    }
+
+    @Test(expectedExceptions = UnsupportedOperationException.class,
+            expectedExceptionsMessageRegExp = "\\Qsubpaths are not supported (yet?)\\E")
+    public void rootUriMustNotHavePath()
+    {
+        FtpFs.normalizeAndCheckRoot(URI.create("ftp://foo/bar"));
+    }
+
+    private Iterator<Object[]> getInvalidURIs()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        list.add(new Object[] { URI.create("foo"), "uri must be absolute" });
+        list.add(new Object[] { URI.create("http://slashdot.org"), "uri scheme must be \"ftp\"" });
+        list.add(new Object[] { URI.create("ftp://foo:bar@host"), "uri must not contain user info" });
+        list.add(new Object[] { URI.create("ftp:/foo"), "uri must have a hostname" });
+
+        return list.iterator();
+    }
+
+    private void incorrectUrisAreRejected(URI uri, String expectedMessage)
     {
         try {
-            FtpFs.normalizeAndCheck(URI.create("foo"));
-            fail("No exception thrown!!");
+            FtpFs.normalizeAndCheckRoot(uri);
+            fail("No exception thrown, but expected an IllegalArgumentException with message: " + expectedMessage);
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "uri must be absolute");
+            assertEquals(e.getMessage(), expectedMessage);
         }
     }
 
-    @Test
-    public void schemeOfUriMustBeFtp()
+    @Test(dataProvider = "getInvalidURIs")
+    public void incorrectRootUrisAreRejected(URI uri, String expectedMessage)
     {
-        try {
-            FtpFs.normalizeAndCheck(URI.create("http://slashdot.org"));
-            fail("No exception thrown!!");
-        } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "uri scheme must be \"ftp\"");
-        }
+        incorrectUrisAreRejected(uri, expectedMessage);
     }
 
-    @Test
-    public void uriMustNotHaveUserInfo()
+    @Test(dataProvider = "getInvalidURIs")
+    public void incorrectNonRootUrisAreRejected(URI uri, String expectedMessage)
     {
-        try {
-            FtpFs.normalizeAndCheck(URI.create("ftp://foo:bar@host"));
-            fail("No exception thrown!!");
-        } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "uri must not contain user info");
-        }
-    }
-
-    @Test
-    public void uriMustIncludeHostname()
-    {
-        try {
-            FtpFs.normalizeAndCheck(URI.create("ftp:/foo"));
-            fail("No exception thrown!!");
-        } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "uri must have a hostname");
-        }
-    }
-
-    @Test
-    public void uriMustNotHavePath()
-    {
-        try {
-            FtpFs.normalizeAndCheck(URI.create("ftp://foo/bar"));
-            fail("No exception thrown!!");
-        } catch (UnsupportedOperationException e) {
-            assertEquals(e.getMessage(), "subpaths are not supported (yet?)");
-        }
+        incorrectUrisAreRejected(uri, expectedMessage);
     }
 
     @DataProvider
-    public Iterator<Object[]> getURIs()
+    public Iterator<Object[]> getRootURIs()
     {
         final List<Object[]> list = new ArrayList<>();
 
@@ -109,12 +98,33 @@ public final class FtpFsTest
         return list.iterator();
     }
 
-    @Test(dataProvider = "getURIs")
-    public void urisAreCorrectlyNormalized(final String orig,
+    @Test(dataProvider = "getRootURIs")
+    public void rootUrisAreCorrectlyNormalized(final String orig,
         final String normalized)
     {
         final URI uri = URI.create(orig);
+        assertEquals(FtpFs.normalizeAndCheckRoot(uri).toString(), normalized);
+    }
 
-        assertEquals(FtpFs.normalizeAndCheck(uri).toString(), normalized);
+    @DataProvider
+    public Iterator<Object[]> getNonRootURIs()
+    {
+        final List<Object[]> list = new ArrayList<>();
+
+        for (Iterator<Object[]> it = getRootURIs(); it.hasNext();) {
+            list.add(it.next());
+        }
+
+        list.add(new Object[] { "ftp://foo/bar", "ftp://foo" });
+
+        return list.iterator();
+    }
+
+    @Test(dataProvider = "getRootURIs")
+    public void nonRootUrisAreCorrectlyNormalized(final String orig,
+        final String normalized)
+    {
+        final URI uri = URI.create(orig);
+        assertEquals(FtpFs.normalizeAndCheckRoot(uri).toString(), normalized);
     }
 }

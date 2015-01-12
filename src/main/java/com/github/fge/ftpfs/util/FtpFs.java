@@ -28,7 +28,17 @@ public final class FtpFs
     {
     }
 
-    public static URI normalizeAndCheck(final URI uri)
+    public static URI normalizeAndCheckRoot(final URI uri)
+    {
+        return normalizeAndCheck(uri, true);
+    }
+
+    public static URI normalizeAndCheckNonRoot(final URI uri)
+    {
+        return normalizeAndCheck(uri, false);
+    }
+
+    private static URI normalizeAndCheck(final URI uri, boolean requireAbsentPath)
     {
         Objects.requireNonNull(uri, "uri cannot be null");
         checkThat(uri.isAbsolute(), "uri must be absolute");
@@ -36,7 +46,7 @@ public final class FtpFs
             "uri scheme must be \"ftp\"");
         checkThat(uri.getUserInfo() == null, "uri must not contain user info");
         checkThat(uri.getHost() != null, "uri must have a hostname");
-        if (uri.getPath() != null && !uri.getPath().isEmpty())
+        if (requireAbsentPath && uri.getPath() != null && !uri.getPath().isEmpty())
             throw new UnsupportedOperationException("subpaths are not supported"
                 + " (yet?)");
         try {

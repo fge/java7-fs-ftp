@@ -82,9 +82,8 @@ public final class FtpFileSystemProvider
 
     @Override
     public FileSystem newFileSystem(final URI uri, final Map<String, ?> env)
-        throws IOException
     {
-        final URI normalized = FtpFs.normalizeAndCheck(uri);
+        final URI normalized = FtpFs.normalizeAndCheckRoot(uri);
 
         final FtpConfiguration.Builder builder = FtpConfiguration.newBuilder()
             .setHostname(normalized.getHost());
@@ -151,17 +150,19 @@ public final class FtpFileSystemProvider
     @Override
     public Path getPath(final URI uri)
     {
-        URI rel;
-        synchronized (fileSystems) {
-            final Set<Map.Entry<URI, FtpFileSystem>> set
-                = fileSystems.entrySet();
-            for (final Map.Entry<URI, FtpFileSystem> entry: set) {
-                rel = entry.getKey().relativize(uri);
-                if (!rel.isAbsolute()) // found
-                    return entry.getValue().getPath(rel.toString());
+        final URI normalized = FtpFs.normalizeAndCheckNonRoot(uri);
+        final URI rel = normalized.relativize(uri);
+        if (!rel.isAbsolute()) { // found
+            final FtpFileSystem fs;
+            synchronized (fileSystems) {
+                fs = fileSystems.get(normalized);
             }
-            throw new IllegalStateException();
+            if (fs != null)
+                return fs.getPath(rel.toString());
         }
+
+        throw new FileSystemNotFoundException("The file system for " + uri
+                + " does not exist and cannot be created automatically");
     }
 
     @Override
